@@ -1,0 +1,26 @@
+.container {
+    display: flex;
+}
+
+.container__sidebar {
+    width: 20%;
+}
+
+.container__main {
+    /* Take the remaining width */
+    flex: 1;
+    height: 100%;
+    min-height: 100%;
+
+    /* Make it scrollable */
+    overflow-y: auto;
+}
+
+#quill-container {
+  height: auto;
+  min-height: 100%;
+}
+#quill-container .ql-editor {
+    font-size: 18px;
+    overflow-y: visible;
+}
