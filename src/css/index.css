@@ -21,11 +21,11 @@ body {
 }
 
 .resize-handle {
-    display: block;
+    display: flex;
     background-color: #cbd5e0;
     cursor: ew-resize;
     height: 100%;
-    width: 1.5px;
+    width: 1px;
 }
 
 .main {

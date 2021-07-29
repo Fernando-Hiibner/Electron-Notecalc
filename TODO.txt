@@ -1,0 +1,2 @@
+TODO Arrumar o hitbox do bangue que controla o tamanho da sidebar
+TODO Todo o resto kkkkk
