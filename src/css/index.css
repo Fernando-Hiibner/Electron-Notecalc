@@ -1,26 +1,54 @@
-.container {
-    display: flex;
-}
-
-.container__sidebar {
-    width: 20%;
-}
-
-.container__main {
-    /* Take the remaining width */
-    flex: 1;
+html, body {
     height: 100%;
-    min-height: 100%;
+    width: 100%;
+}
+body {
+    margin: 0;
+}
 
-    /* Make it scrollable */
+.parent-container {
+    display: flex;
+
+    /* Misc */
+    height: 100%;
+    width: 100%;
+
+    overflow: auto;
+}
+
+.sidebar {
+    width: 200px;
+}
+
+.resize-handle {
+    display: block;
+    background-color: #cbd5e0;
+    cursor: ew-resize;
+    height: 100%;
+    width: 1.5px;
+}
+
+.main {
+    flex: 1;
+}
+
+/* Tell Quill not to scroll */
+#quill-container {
+    height: auto;
+    min-height: 100%;
+}
+/* Specify our own scrolling container */
+#scrolling-container {
     overflow-y: auto;
 }
 
-#quill-container {
-  height: auto;
-  min-height: 100%;
+#sidebarP {
+    margin: 0;
+    cursor: pointer;
 }
-#quill-container .ql-editor {
-    font-size: 18px;
-    overflow-y: visible;
+
+#sidebarP:hover {
+    background-color: #cccccc;
+    border-color: #1e1e1e;
+    cursor: pointer;
 }

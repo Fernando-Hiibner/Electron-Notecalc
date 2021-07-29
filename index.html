@@ -7,18 +7,17 @@
         <title>Electron Notecalc</title>
     </head>
     <body>
-        <div class="container">
+        <div class = "parent-container">
             <!-- Sidebar -->
-            <aside class="container__sidebar">
-                ...
-            </aside>
-
+            <div class = "sidebar" id = "sidebar"></div>
+            <!-- Resizing Hangle -->
+            <div class = "resize-handle" id = "handle"></div>
             <!-- Main -->
-            <main class="container__main">
+            <div class = "main" id = "scrolling-container">
                 <div class="editor" id = "quill-container">
                     <!-- O editor quill fica aqui -->
                 </div>
-            </main>
+            </div>
         </div>
         <script src = "./renderer.js"></script>
     </body>
