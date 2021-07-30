@@ -1,0 +1,57 @@
+@font-face {
+    font-family: Droid Sans Mono;
+    src: url('../fonts/Droid Sans Mono Nerd Font Complete.otf');
+}
+
+.sidebar {
+    overflow: auto;
+    user-select: none;
+    white-space: nowrap;
+    font-family: 'Droid Sans Mono';
+}
+
+/* Remove default bullets */
+ul, #fatherNode {
+    list-style-type: none;
+}
+
+/* Remove margins and padding from the parent ul */
+#fatherNode {
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar span:hover {
+    background-color: #cccccc;
+    cursor: pointer;
+}
+
+/* Style the caret/arrow */
+.folder {
+    cursor: pointer;
+    user-select: none; /* Prevent text selection */
+}
+
+/* Create the caret/arrow with a unicode, and style it */
+.folder::before {
+    content: "\005E";
+    color: black;
+    display: inline-block;
+    margin-right: 6px;
+    transform: rotate(90deg);
+}
+
+/* Rotate the caret/arrow icon when clicked on (using JavaScript) */
+.folder-down::before {
+    transform: rotate(180deg);
+}
+
+/* Hide the nested list */
+.nested {
+    display: none;
+}
+
+/* Show the nested list when the user clicks on the caret/arrow (with JavaScript) */
+.active {
+    display: block;
+}

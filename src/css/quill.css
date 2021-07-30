@@ -1,0 +1,9 @@
+/* Tell Quill not to scroll */
+#quill-container {
+    height: auto;
+    min-height: 100%;
+}
+/* Specify our own scrolling container */
+#scrolling-container {
+    overflow-y: auto;
+}

@@ -2,7 +2,70 @@ const {app, globalShortcut} = require('electron');
 const Quill = require('quill');
 const path = require('path');
 const fs = require('fs');
+const { read } = require('original-fs');
 
+function recursiveAsyncReadDir(directory, done) {
+    console.log(directory)
+    var folders = [];
+    var files = [];
+    fs.readdir(directory, function(err, list) {
+      if (err) return done(err);
+      var i = 0;
+      (function next() {
+        var file = list[i++];
+        if (!file) return done(null, folders, files);
+        file = path.resolve(directory, file);
+        fs.stat(file, function(err, stat) {
+            if (stat && stat.isDirectory()) folders.push(file);
+            else files.push(file);
+            next();
+        });
+      })();
+    });
+}
+
+function readDirectory(directory, node) {
+    if(node.id !== 'fatherNode') {
+        console.log("Entrou aqui")
+        console.log(node)
+        var nestedUL = document.createElement('ul');
+        nestedUL.setAttribute('class', 'nested');
+        node.appendChild(nestedUL);
+    }
+    else {
+        nestedUL = document.getElementById('fatherNode');
+    }
+
+    console.log(nestedUL)
+
+    recursiveAsyncReadDir(directory, (err, folders, files) => {
+        if(folders) {
+            folders.forEach((folder) => {
+                let folderLI = document.createElement('li');
+                let folderSPAN = document.createElement('span');
+                folderSPAN.setAttribute('class', 'folder');
+                folderSPAN.innerText = path.basename(folder)
+                folderLI.appendChild(folderSPAN);
+                nestedUL.appendChild(folderLI);
+                folderSPAN.addEventListener('click', () => {
+                    if(!folderLI.parentElement.querySelector(".nested")) {
+                        readDirectory(path.join(directory, path.basename(folder)), folderLI);
+                    }
+                    folderLI.parentElement.querySelector(".nested").classList.toggle("active");
+                    folderLI.classList.toggle("folder-down")
+                });
+            });
+        }
+        if(files) {
+            files.forEach((file) => {
+                let fileLI = document.createElement('li');
+                fileLI.setAttribute('class', 'file');
+                fileLI.innerText = path.basename(file);
+                nestedUL.appendChild(fileLI);
+            });
+        }
+    });
+}
 
 window.addEventListener('DOMContentLoaded', () => {
     // Create quill
@@ -17,35 +80,12 @@ window.addEventListener('DOMContentLoaded', () => {
         scrollingContainer: '#scrolling-container'
     });
 
-    // Async Read dir and place files and folders in the sidebar
+    // Sidebar
     var sidebar = document.getElementById('sidebar');
-    sidebar.innerText = path.basename(__dirname);
-    fs.readdir(__dirname, (err, files) => {
-        if (err) console.log(err);
-        else {files.forEach(file => {
-            fs.lstat(path.join(__dirname, file), (err, stats) => {
-                if(err) console.log(err);
-                else if (stats.isDirectory()) {
-                    let fileLi = document.createElement('p');
-                    fileLi.setAttribute('id', 'sidebarP');
-                    fileLi.innerText = file;
-                    sidebar.appendChild(fileLi);
-                }
-            });
-        })}
-    });
-    fs.readdir(__dirname, (err, files) => {
-        if (err) console.log(err);
-        else {files.forEach(file => {
-            fs.lstat(path.join(__dirname, file), (err, stats) => {
-                if(err) console.log(err);
-                else if (stats.isFile()) {
-                    let fileLi = document.createElement('p');
-                    fileLi.setAttribute('id', 'sidebarP');
-                    fileLi.innerText = file;
-                    sidebar.appendChild(fileLi);
-                }
-            });
-        })}
-    });
+
+    var fatherNode = document.createElement('ul');
+    fatherNode.setAttribute('id', 'fatherNode');
+    sidebar.appendChild(fatherNode);
+
+    readDirectory(process.cwd(), fatherNode);
 });

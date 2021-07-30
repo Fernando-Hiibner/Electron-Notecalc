@@ -8,14 +8,14 @@ function createMainWindow() {
         height: 600,
 
         webPreferences: {
-            preload: path.join(__dirname, 'preload.js')
+            preload: path.join(__dirname, 'preload.js'),
         }
     });
 
     win.loadFile('index.html');
 }
 
-app.whenReady().then(createMainWindow)
+app.whenReady().then(createMainWindow);
 
 // MacOs compatibility
 app.on('activate', () => {
