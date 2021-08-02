@@ -5,7 +5,6 @@ const fs = require('fs');
 const { read } = require('original-fs');
 
 function recursiveAsyncReadDir(directory, done) {
-    console.log(directory)
     var folders = [];
     var files = [];
     fs.readdir(directory, function(err, list) {
@@ -22,6 +21,18 @@ function recursiveAsyncReadDir(directory, done) {
         });
       })();
     });
+}
+
+function recursiveDepthCalc(el, sum) {
+    if(el.parentElement.id === 'fatherNode') {
+        return sum;
+    }
+    else if (el.tagName !== 'UL') {
+        return recursiveDepthCalc(el.parentElement, sum);
+    }
+    else {
+        return recursiveDepthCalc(el.parentElement, sum+1);
+    }
 }
 
 function readDirectory(directory, node) {
@@ -43,6 +54,8 @@ function readDirectory(directory, node) {
                 folderSPAN.innerText = path.basename(folder)
                 folderLI.appendChild(folderSPAN);
                 nestedUL.appendChild(folderLI);
+                depth = recursiveDepthCalc(folderLI, 0);
+                folderSPAN.style.paddingLeft = `${depth*0.5}cm`
                 folderSPAN.addEventListener('click', () => {
                     if(!folderSPAN.parentElement.querySelector(".nested")) {
                         readDirectory(path.join(directory, path.basename(folder)), folderLI);
@@ -55,9 +68,13 @@ function readDirectory(directory, node) {
         if(files) {
             files.forEach((file) => {
                 let fileLI = document.createElement('li');
-                fileLI.setAttribute('class', 'file');
-                fileLI.innerText = path.basename(file);
+                let fileSPAN = document.createElement('span');
+                fileSPAN.setAttribute('class', 'file');
+                fileSPAN.innerText = path.basename(file);
+                fileLI.appendChild(fileSPAN);
                 nestedUL.appendChild(fileLI);
+                depth = recursiveDepthCalc(fileLI, 0);
+                fileSPAN.style.paddingLeft = `${depth*0.5}cm`;
             });
         }
     });

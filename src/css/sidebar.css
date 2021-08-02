@@ -4,26 +4,35 @@
 }
 
 .sidebar {
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
     user-select: none;
     white-space: nowrap;
     font-family: 'Droid Sans Mono';
+    font-size: 14px;
 }
 
 /* Remove default bullets */
 ul, #fatherNode {
     list-style-type: none;
+    padding: 0;
+}
+
+.sidebar span {
+    display: inline-block;
+    width: 100%;
+}
+
+.sidebar span:hover {
+    background-color: #cccccc;
+    cursor: pointer;
 }
 
 /* Remove margins and padding from the parent ul */
 #fatherNode {
     margin: 0;
     padding: 0;
-}
-
-.sidebar span:hover {
-    background-color: #cccccc;
-    cursor: pointer;
+    width: 100%;
 }
 
 /* Style the caret/arrow */
