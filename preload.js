@@ -1,8 +1,7 @@
-const {app, globalShortcut} = require('electron');
+const highlight = require('highlight.js');
 const Quill = require('quill');
 const path = require('path');
 const fs = require('fs');
-const { read } = require('original-fs');
 
 function recursiveAsyncReadDir(directory, done) {
     var folders = [];
@@ -82,13 +81,37 @@ function readDirectory(directory, node) {
 
 window.addEventListener('DOMContentLoaded', () => {
     // Create quill
+    var toolbarOptions = [
+        ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+        ['blockquote', 'code-block'],
+
+        [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+        [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+        [{ 'script': 'sub'}, { 'script': 'super' }],      // superscript/subscript
+        [{ 'indent': '-1'}, { 'indent': '+1' }],          // outdent/indent
+        [{ 'direction': 'rtl' }],                         // text direction
+
+        [{ 'size': ['small', false, 'large', 'huge'] }],  // custom dropdown
+        [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+
+        [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+        [{ 'font': [] }],
+        [{ 'align': [] }],
+
+        ['image', 'video'],
+
+        ['clean']                                         // remove formatting button
+      ];
     var editor = new Quill('.editor', {
         theme: 'snow',
         modules: {
             clipboard: {
-                matchVisual: false
+                matchVisual: true
             },
-            toolbar: false
+            toolbar: toolbarOptions,
+            syntax: {
+                highlight: (text) => highlight.highlightAuto(text).value,
+            }
         },
         scrollingContainer: '#scrolling-container'
     });
