@@ -1,3 +1,4 @@
 TODO Arrumar o hitbox do bangue que controla o tamanho da sidebar
 TODO Sidebar ta quase la, arrumar ela e o hitbox dos cliques / hover
+TODO Quase tudo pronto na sidebar, falta só arrumar esse bangue de varios icones de pastas aparecendo onde não devia e testar bastante, ai implementar criação de arquivo e pasta na pasta selecionada, bem vs code mesmo, implementar tambem a div com o nome da pasta pai atual
 TODO Todo o resto kkkkk
