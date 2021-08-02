@@ -26,8 +26,6 @@ function recursiveAsyncReadDir(directory, done) {
 
 function readDirectory(directory, node) {
     if(node.id !== 'fatherNode') {
-        console.log("Entrou aqui")
-        console.log(node)
         var nestedUL = document.createElement('ul');
         nestedUL.setAttribute('class', 'nested');
         node.appendChild(nestedUL);
@@ -35,8 +33,6 @@ function readDirectory(directory, node) {
     else {
         nestedUL = document.getElementById('fatherNode');
     }
-
-    console.log(nestedUL)
 
     recursiveAsyncReadDir(directory, (err, folders, files) => {
         if(folders) {
@@ -48,11 +44,11 @@ function readDirectory(directory, node) {
                 folderLI.appendChild(folderSPAN);
                 nestedUL.appendChild(folderLI);
                 folderSPAN.addEventListener('click', () => {
-                    if(!folderLI.parentElement.querySelector(".nested")) {
+                    if(!folderSPAN.parentElement.querySelector(".nested")) {
                         readDirectory(path.join(directory, path.basename(folder)), folderLI);
                     }
-                    folderLI.parentElement.querySelector(".nested").classList.toggle("active");
-                    folderLI.classList.toggle("folder-down")
+                    folderSPAN.parentElement.querySelector(".nested").classList.toggle("active");
+                    folderSPAN.classList.toggle("folder-down");
                 });
             });
         }

@@ -34,16 +34,15 @@ ul, #fatherNode {
 
 /* Create the caret/arrow with a unicode, and style it */
 .folder::before {
-    content: "\005E";
+    content: "\e5ff";
     color: black;
     display: inline-block;
     margin-right: 6px;
-    transform: rotate(90deg);
 }
 
 /* Rotate the caret/arrow icon when clicked on (using JavaScript) */
 .folder-down::before {
-    transform: rotate(180deg);
+    content: "\e5fe";
 }
 
 /* Hide the nested list */
