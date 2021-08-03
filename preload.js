@@ -53,6 +53,7 @@ function readDirectory(directory, node) {
                 let folderLI = document.createElement('li');
                 let folderSPAN = document.createElement('span');
                 folderSPAN.setAttribute('class', 'folder');
+                folderSPAN.id = String(folder)
                 folderSPAN.innerText = path.basename(folder);
                 folderLI.appendChild(folderSPAN);
                 nestedUL.appendChild(folderLI);
@@ -67,6 +68,11 @@ function readDirectory(directory, node) {
                     }
                     folderSPAN.parentElement.querySelector(".nested").classList.toggle("active");
                     folderSPAN.classList.toggle("folder-down");
+
+                    if(document.getElementsByClassName('selected')[0] !== null) {
+                        document.getElementsByClassName('selected')[0].classList.toggle('selected')
+                    }
+                    folderSPAN.classList.toggle('selected')
                 });
             });
         }
@@ -76,12 +82,19 @@ function readDirectory(directory, node) {
                 let fileLI = document.createElement('li');
                 let fileSPAN = document.createElement('span');
                 fileSPAN.setAttribute('class', 'file');
+                fileSPAN.id = String(file)
                 fileSPAN.innerText = path.basename(file);
                 fileLI.appendChild(fileSPAN);
                 nestedUL.appendChild(fileLI);
                 // Calculates how depth the node is, in order to give him correct padding
                 depth = recursiveDepthCalc(fileLI, 0);
                 fileSPAN.style.paddingLeft = `${depth * 0.5}cm`;
+                fileSPAN.addEventListener('click', () => {
+                    if(document.getElementsByClassName('selected')[0]  !== undefined) {
+                        document.getElementsByClassName('selected')[0].classList.toggle('selected')
+                    }
+                    fileSPAN.classList.toggle('selected')
+                })
             });
         }
     });
@@ -99,6 +112,7 @@ function readUpperDirectory(upperDirectory, currentDirectory, fatherNode, folder
                 let folderLI = document.createElement('li');
                 let folderSPAN = document.createElement('span');
                 folderSPAN.setAttribute('class', 'folder');
+                folderSPAN.id = String(folder)
                 folderSPAN.innerText = path.basename(folder);
                 folderLI.appendChild(folderSPAN);
                 // Check if the folder it is reading is the current folder we are, if it is, loads and childs the current nodes to the new father
@@ -132,6 +146,11 @@ function readUpperDirectory(upperDirectory, currentDirectory, fatherNode, folder
                     if (folderSPAN.classList[0] !== "folder-down") {
                         folderSPAN.classList.toggle("folder-down");
                     }
+
+                    if(document.getElementsByClassName('selected')[0]  !== null) {
+                        document.getElementsByClassName('selected')[0].classList.toggle('selected')
+                    }
+                    folderSPAN.classList.toggle('selected')
                 });
             });
         }
@@ -140,11 +159,18 @@ function readUpperDirectory(upperDirectory, currentDirectory, fatherNode, folder
                 let fileLI = document.createElement('li');
                 let fileSPAN = document.createElement('span');
                 fileSPAN.setAttribute('class', 'file');
+                fileSPAN.id = String(file)
                 fileSPAN.innerText = path.basename(file);
                 fileLI.appendChild(fileSPAN);
                 newFatherNode.appendChild(fileLI);
                 depth = recursiveDepthCalc(fileLI, 0);
                 fileSPAN.style.paddingLeft = `${depth * 0.5}cm`;
+                fileSPAN.addEventListener('click', () => {
+                    if(document.getElementsByClassName('selected')[0] !== null) {
+                        document.getElementsByClassName('selected')[0].classList.toggle('selected')
+                    }
+                    fileSPAN.classList.toggle('selected')
+                })
             });
         }
     });
@@ -335,6 +361,11 @@ window.addEventListener('DOMContentLoaded', () => {
 
     newFileButton.setAttribute('class', 'sidebarHeaderButtons');
     newFileButton.setAttribute('id', 'newFileButton');
+    newFileButton.addEventListener('click', () => {
+        if(document.getElementsByClassName('selected')[0]  !== null) {
+            console.log(document.getElementsByClassName('selected')[0].id)
+        }
+    })
 
     newFolderButton.setAttribute('class', 'sidebarHeaderButtons');
     newFolderButton.setAttribute('id', 'newFolderButton');
