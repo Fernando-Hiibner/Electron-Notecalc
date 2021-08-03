@@ -1,22 +1,18 @@
 .parent-container {
-    display: flex;
-
-    /* Misc */
-    height: 100%;
     width: 100%;
-
-    /* overflow: auto; */
+    height: 100%;
+    display: flex;
 }
 
 .sidebar {
     width: 200px;
 }
 .resize-handle {
-    display: flex;
-    background-color: #cbd5e0;
-    cursor: ew-resize;
-    height: 100%;
     width: 1px;
+    height: 100%;
+    display: flex;
+    cursor: ew-resize;
+    background-color: #cbd5e0;
 }
 
 .main {
