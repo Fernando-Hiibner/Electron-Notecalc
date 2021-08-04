@@ -34,7 +34,7 @@ function recursiveDepthCalc(el, sum) {
     }
 }
 
-function readDirectory(directory, node) {
+function readDirectory(directory, node, openFolders = []) {
     // Create a new UL if node !== 'fatherNode' (node === Sub-directory)
     if (node.id !== 'fatherNode') {
         var nestedUL = document.createElement('ul');
@@ -69,11 +69,19 @@ function readDirectory(directory, node) {
                     folderSPAN.parentElement.querySelector(".nested").classList.toggle("active");
                     folderSPAN.classList.toggle("folder-down");
 
-                    if(document.getElementsByClassName('selected')[0] !== null) {
-                        document.getElementsByClassName('selected')[0].classList.toggle('selected')
+                    if(document.getElementsByClassName('selected')[0] !== undefined) {
+                        document.getElementsByClassName('selected')[0].classList.toggle('selected');
                     }
-                    folderSPAN.classList.toggle('selected')
+                    folderSPAN.classList.toggle('selected');
                 });
+                if(openFolders.includes(folderSPAN.id)) {
+                    // Check if this folder is already loaded, if not, load it
+                    if (!folderSPAN.parentElement.querySelector(".nested")) {
+                        readDirectory(path.join(directory, path.basename(folder)), folderLI, openFolders);
+                    }
+                    folderSPAN.parentElement.querySelector(".nested").classList.toggle("active");
+                    folderSPAN.classList.toggle("folder-down");
+                };
             });
         }
         if (files) {
@@ -91,13 +99,14 @@ function readDirectory(directory, node) {
                 fileSPAN.style.paddingLeft = `${depth * 0.5}cm`;
                 fileSPAN.addEventListener('click', () => {
                     if(document.getElementsByClassName('selected')[0]  !== undefined) {
-                        document.getElementsByClassName('selected')[0].classList.toggle('selected')
+                        document.getElementsByClassName('selected')[0].classList.toggle('selected');
                     }
-                    fileSPAN.classList.toggle('selected')
+                    fileSPAN.classList.toggle('selected');
                 })
             });
         }
     });
+    return nestedUL;
 }
 
 function readUpperDirectory(upperDirectory, currentDirectory, fatherNode, folderNameText) {
@@ -147,10 +156,10 @@ function readUpperDirectory(upperDirectory, currentDirectory, fatherNode, folder
                         folderSPAN.classList.toggle("folder-down");
                     }
 
-                    if(document.getElementsByClassName('selected')[0]  !== null) {
-                        document.getElementsByClassName('selected')[0].classList.toggle('selected')
+                    if(document.getElementsByClassName('selected')[0]  !== undefined) {
+                        document.getElementsByClassName('selected')[0].classList.toggle('selected');
                     }
-                    folderSPAN.classList.toggle('selected')
+                    folderSPAN.classList.toggle('selected');
                 });
             });
         }
@@ -166,17 +175,39 @@ function readUpperDirectory(upperDirectory, currentDirectory, fatherNode, folder
                 depth = recursiveDepthCalc(fileLI, 0);
                 fileSPAN.style.paddingLeft = `${depth * 0.5}cm`;
                 fileSPAN.addEventListener('click', () => {
-                    if(document.getElementsByClassName('selected')[0] !== null) {
-                        document.getElementsByClassName('selected')[0].classList.toggle('selected')
+                    if(document.getElementsByClassName('selected')[0] !== undefined) {
+                        document.getElementsByClassName('selected')[0].classList.toggle('selected');
                     }
-                    fileSPAN.classList.toggle('selected')
-                })
+                    fileSPAN.classList.toggle('selected');
+                });
             });
         }
     });
     process.chdir(upperDirectory);
     folderNameText.innerText = path.basename(process.cwd()).toUpperCase();
     return newFatherNode;
+}
+
+function refreshDirectory(directory, node) {
+    let childs = node.getElementsByTagName('UL');
+    let selectedId = undefined;
+    let openFolders = [];
+    if (document.getElementsByClassName('selected')[0] !== undefined) {
+        selectedId = document.getElementsByClassName('selected')[0].id;
+    }
+    for (let i = 0; i < childs.length; i++) {
+        if (childs[i].classList.contains('active')) {
+            openFolders.push(childs[i].parentElement.firstChild.id);
+        }
+    }
+    for(let i = 0; i < childs.length; i++) {
+        if (childs[i].tagName === 'UL') {
+            node.removeChild(childs[i])
+        }
+    }
+    let newUl = readDirectory(directory, node, openFolders);
+    newUl.classList.toggle('active');
+    node.appendChild(newUl);
 }
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -362,8 +393,20 @@ window.addEventListener('DOMContentLoaded', () => {
     newFileButton.setAttribute('class', 'sidebarHeaderButtons');
     newFileButton.setAttribute('id', 'newFileButton');
     newFileButton.addEventListener('click', () => {
-        if(document.getElementsByClassName('selected')[0]  !== null) {
-            console.log(document.getElementsByClassName('selected')[0].id)
+        if(document.getElementsByClassName('selected')[0]  !== undefined) {
+            let el = document.getElementsByClassName('selected')[0]
+            fs.lstat(el.id, (err, stat) => {
+                if(err) throw err;
+                if(stat && stat.isDirectory()) {
+                    fs.writeFileSync(path.join(el.id, "Baozi.txt"), "OI!");
+                    refreshDirectory(el.id, el.parentElement);
+                }
+                else if(stat && stat.isFile()) {
+                    fs.writeFileSync(path.join(path.dirname(el.id), "Baozi.txt"), "OI!");
+                    console.log(el.parentElement, el.parentElement.parentElement)
+                    refreshDirectory(path.dirname(el.id), el.parentElement.parentElement);
+                }
+            })
         }
     })
 

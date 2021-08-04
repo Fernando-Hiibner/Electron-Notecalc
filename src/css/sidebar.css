@@ -98,10 +98,6 @@ ul {
     display: block;
 }
 
-.active span {
-    border-left: 0.5px #1e1e1e solid;
-}
-
 .selected {
     background-color: #cccccc;
 }

@@ -2,3 +2,4 @@ TODO Arrumar o hitbox do bangue que controla o tamanho da sidebar
 TODO Sidebar ta quase la, arrumar ela e o hitbox dos cliques / hover
 TODO Quase tudo pronto na sidebar, falta só arrumar esse bangue de varios icones de pastas aparecendo onde não devia e testar bastante, ai implementar criação de arquivo e pasta na pasta selecionada, bem vs code mesmo, implementar tambem a div com o nome da pasta pai atual
 TODO Todo o resto kkkkk
+TODO Arrumar agora a implementação do criar arquivo, basicamente criar o arquivo quando está clicando no arquivo da ruim, revisar essa função de refresh, talvez ela seja incapaz de suportar isso, depois passar pra poder criar o nome do arquivo, criar pasta, deletar arquivos e multipla seleção, sofrer basicamente
