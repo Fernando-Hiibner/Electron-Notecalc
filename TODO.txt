@@ -1,4 +1,8 @@
-TODO Poder criar o nome do arquivo/pasta, e multipla seleção, sofrer basicamente
-TODO Resolver o sliceMainFolderName quando da upperDirectory com espaço suficiente pro nome e ele corta
-TODO Resolver o BO da scrollBar cagando o role da sliceMainFolderName
-TODO Tentar implementar o slice name pras pastas e arquivos além do master
+// Todo
+TODO Poder criar o nome do arquivo/pasta, e multipla seleção, sofrer basicamente.
+TODO Tentar implementar o slice name pras pastas e arquivos além do master.
+
+// Fixme
+FIXME A multipla seleção deleta os arquivos selecionados, mas quando cria, considera só o ultimo selecionado e não todos, mesma coisa na hora de renomear.
+FIXME Resolver o sliceMainFolderName quando da upperDirectory com espaço suficiente pro nome e ele corta.
+FIXME Resolver o BO da scrollBar cagando o role da sliceMainFolderName.

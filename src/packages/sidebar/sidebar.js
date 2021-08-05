@@ -207,15 +207,42 @@ function refreshDirectory(directory, node) {
     }
     let newUl = readDirectory(directory, node, openFolders);
     if(newUl.id === 'fatherNode') {
-        while(newUl.firstChild) {
-            node.appendChild(newUl.firstChild);
-            newUl.removeChild(newUl.firstChild);
+        while(node.firstChild) {
+            node.removeChild(node.firstChild);
         }
+        node.remove()
+        node = newUl
+        document.getElementById('sidebar').appendChild(node)
     }
     else {
         newUl.classList.toggle('active');
         node.appendChild(newUl);
     }
+}
+
+function nameInputFunc(node, margin, writeFunction) {
+    let nameInput = document.createElement('input');
+    nameInput.setAttribute('type', 'text');
+    node.appendChild(nameInput);
+    // FIXME Ver esse bangue aqui, ele ta "funcionando, UNICO problema é ele focar fora do campo de visão e dedar o hover, fazer ele ter o tamanho descente
+    nameInput.style.marginLeft = margin;
+    nameInput.focus({
+        preventScrollX: true
+    });
+    nameInput.addEventListener('focusout', () => {nameInput.remove()})
+    nameInput.addEventListener('keydown', (event) => {
+        if(event.key === 'Enter') {
+            if(nameInput.value === "") {
+                alert("Insira um nome!");
+                return;
+            }
+            writeFunction(nameInput);
+        }
+        else if(event.key === 'Escape') {
+            nameInput.remove();
+            return;
+        }
+    })
 }
 
 function newFileButtonClickCallback(fatherNode) {
@@ -224,36 +251,55 @@ function newFileButtonClickCallback(fatherNode) {
         fs.lstat(el.id, (err, stat) => {
             if(err) throw err;
             if(stat && stat.isDirectory()) {
-                // let nameInput = document.createElement('input');
-                // nameInput.setAttribute('type', 'text');
-                // el.parentElement.appendChild(nameInput);
-                fs.writeFile(path.join(el.id, "Baozi.txt"), "OI!", (err) => {
-                    if(err) console.log(err);
-                    else {
-                        refreshDirectory(el.id, el.parentElement);
-                    }
+                nameInputFunc(el.parentElement, el.style.paddingLeft, (nameInput) => {
+                    fs.writeFile(path.join(el.id, nameInput.value), "", (err) => {
+                        if(err) {
+                            alert(err);
+                            nameInput.remove();
+                        }
+                        else {
+                            refreshDirectory(el.id, el.parentElement);
+                            nameInput.remove();
+                        }
+                    });
                 });
             }
             else if(stat && stat.isFile()) {
-                fs.writeFile(path.join(path.dirname(el.id), "Baozi.txt"), "OI!", (err) => {
-                    if(err) console.log(err);
-                    else {
-                        let elFolder = document.getElementById(path.dirname(el.id));
-                        if(elFolder === null) {
-                            refreshDirectory(path.dirname(el.id), fatherNode);
+                let elFolder = document.getElementById(path.dirname(el.id));
+                let anchorNode = null;
+                if(elFolder === null) {
+                    anchorNode = fatherNode;
+                }
+                else {
+                    anchorNode = elFolder.parentElement;
+                }
+                nameInputFunc(anchorNode, el.style.paddingLeft, (nameInput) => {
+                    fs.writeFile(path.join(path.dirname(el.id), nameInput.value), "", (err) => {
+                        if(err) {
+                            alert(err);
+                            nameInput.remove();
                         }
                         else {
-                            refreshDirectory(path.dirname(el.id), elFolder.parentElement);
+                            refreshDirectory(path.dirname(el.id), anchorNode)
+                            nameInput.remove();
                         }
-                    }
-                });
+                    });
+                })
             }
         })
     }
     else {
-        fs.writeFile(path.join(process.cwd(), "Baozi.txt"), "OI!", (err) => {
-            if(err) console.log(err);
-            else refreshDirectory(process.cwd(), fatherNode);
+        nameInputFunc(fatherNode, '0.5cm', (nameInput) => {
+            fs.writeFile(path.join(process.cwd(), nameInput.value), "", (err) => {
+                if(err) {
+                    alert(err);
+                    nameInput.remove();
+                }
+                else {
+                    refreshDirectory(process.cwd(), fatherNode);
+                    nameInput.remove();
+                }
+            })
         })
     }
 }
@@ -264,31 +310,56 @@ function newFolderButtonClickCallback(fatherNode) {
         fs.lstat(el.id, (err, stat) => {
             if(err) throw err;
             if(stat && stat.isDirectory()) {
-                fs.mkdir(path.join(el.id, "Baozi"), (err) => {
-                    if(err) console.log(err);
-                    else {
-                        refreshDirectory(el.id, el.parentElement);
-                    }
-                });
+                nameInputFunc(el.parentElement, el.style.paddingLeft, (nameInput) => {
+                    fs.mkdir(path.join(el.id, nameInput.value), (err) => {
+                        if(err) {
+                            alert(err);
+                            nameInput.remove();
+                        }
+                        else {
+                            refreshDirectory(el.id, el.parentElement);
+                            nameInput.remove();
+                        }
+                    });
+                })
             }
             else if(stat && stat.isFile()) {
-                fs.mkdir(path.join(path.dirname(el.id), "Baozi"), (err) => {
-                    let elFolder = document.getElementById(path.dirname(el.id));
-                    if(elFolder === null) {
-                        refreshDirectory(path.dirname(el.id), fatherNode);
-                    }
-                    else {
-                        refreshDirectory(path.dirname(el.id), elFolder.parentElement);
-                    }
-                });
+                let elFolder = document.getElementById(path.dirname(el.id));
+                let anchorNode = null;
+                if(elFolder === null) {
+                    anchorNode = fatherNode;
+                }
+                else {
+                    anchorNode = elFolder.parentElement;
+                }
+                nameInputFunc(anchorNode, el.style.paddingLeft, (nameInput) => {
+                    fs.mkdir(path.join(path.dirname(el.id), "Baozi"), (err) => {
+                        if(err) {
+                            alert(err);
+                            nameInput.remove();
+                        }
+                        else {
+                            refreshDirectory(path.dirname(el.id), anchorNode);
+                            nameInput.remove();
+                        }
+                    });
+                })
             }
         })
     }
     else {
-        fs.mkdir(path.join(process.cwd(), "Baozi"), (err) => {
-            if (err) console.log(err);
-            else refreshDirectory(process.cwd(), fatherNode);
-        });
+        nameInputFunc(fatherNode, '0.5cm', (nameInput) => {
+            fs.mkdir(path.join(process.cwd(), nameInput.value), (err) => {
+                if (err) {
+                    alert(err);
+                    nameInput.remove();
+                }
+                else {
+                    refreshDirectory(process.cwd(), fatherNode);
+                    nameInput.remove();
+                }
+            });
+        })
     }
 }
 
@@ -301,13 +372,9 @@ function deleteButtonClickCallback(fatherNode) {
                 refreshDirectory(process.cwd(), fatherNode);
             }
             catch(err) {
-                console.log(err);
+                alert(err);
             }
         })();
-        console.log(fatherNode);
-    }
-    else {
-        console.log("Hoje o deletar vai ser em número porque o arquivo não foi selecionado!")
     }
 }
 
