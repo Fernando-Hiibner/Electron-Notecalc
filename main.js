@@ -10,8 +10,7 @@ function createMainWindow() {
         // frame: false,
 
         webPreferences: {
-            preload: path.join(__dirname, 'preload.js'),
-            nodeIntegration: true
+            preload: path.join(__dirname, 'preload.js')
         }
     });
 

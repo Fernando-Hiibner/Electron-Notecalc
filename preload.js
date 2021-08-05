@@ -1,12 +1,34 @@
 const {readDirectory, readUpperDirectory, refreshDirectory} = require('sidebar');
 const {toolbarOptions, showColorPicker} = require('quill-increment');
 const highlight = require('highlight.js');
+const {contextBridge} = require('electron');
 const Quill = require('quill');
 const path = require('path');
 const del = require('del');
 const fs = require('fs');
 
+
+function sliceMainFolderName(sliceIndex, currentFolderName) {
+    if(path.basename(process.cwd()).length < sliceIndex || path.basename(process.cwd()).length === sliceIndex) {
+        currentFolderName.innerText = path.basename(process.cwd()).toUpperCase();
+    }
+    else {
+        if(sliceIndex < 10) {
+            sliceIndex = 10;
+        }
+        currentFolderName.innerText = path.basename(process.cwd()).toUpperCase().slice(0, sliceIndex) + "...";
+    }
+}
+
+contextBridge.exposeInMainWorld('bridge', {
+    sliceMainFolderName: (sliceIndex, currentFolderName) => {
+        sliceMainFolderName(sliceIndex, currentFolderName);
+    }
+});
+
 window.addEventListener('DOMContentLoaded', () => {
+    // Change cwd to test folder
+    process.chdir('C:\\Users\\fernandoaffonso\\Desktop\\Pessoal\\Estudos\\Javascript\\Electron 2 Test Folder');
     // Create quill
     let editor = new Quill('.editor', {
         theme: 'snow',
@@ -40,7 +62,6 @@ window.addEventListener('DOMContentLoaded', () => {
 
     sidebarHeaderDiv.setAttribute('id', 'sidebarHeaderDiv');
     currentFolderName.setAttribute('id', 'currentFolderName');
-    currentFolderName.innerText = path.basename(process.cwd()).toUpperCase();
 
     let sidebarHeaderButtonsDiv = document.createElement('div')
        ,newFileButton = document.createElement('button')
@@ -138,6 +159,7 @@ window.addEventListener('DOMContentLoaded', () => {
                 }
             })();
             refreshDirectory(process.cwd(), fatherNode);
+            console.log(fatherNode);
         }
         else {
             console.log("Hoje o deletar vai ser em número porque o arquivo não foi selecionado!")
@@ -151,6 +173,7 @@ window.addEventListener('DOMContentLoaded', () => {
     sidebarHeaderDiv.appendChild(upperFolderButton)
     sidebarHeaderDiv.appendChild(currentFolderName);
     sidebarHeaderDiv.appendChild(sidebarHeaderButtonsDiv);
+    sliceMainFolderName(10, currentFolderName);
 
     let fatherNode = document.createElement('ul');
     fatherNode.setAttribute('id', 'fatherNode');

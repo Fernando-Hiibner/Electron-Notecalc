@@ -182,7 +182,12 @@ function readUpperDirectory(upperDirectory, currentDirectory, fatherNode, folder
         }
     });
     process.chdir(upperDirectory);
-    folderNameText.innerText = path.basename(process.cwd()).toUpperCase();
+    if(path.basename(process.cwd()).length <= 10) {
+        folderNameText.innerText = path.basename(process.cwd()).toUpperCase();
+    }
+    else {
+        folderNameText.innerText = path.basename(process.cwd()).toUpperCase().slice(0, 10) + "...";
+    }
     return newFatherNode;
 }
 

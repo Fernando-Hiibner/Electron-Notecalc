@@ -33,7 +33,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Sets the new size of the sidebar
         const newSidebarWidth = (sidebarWidth + distMouseX) * 100 / handler.parentNode.getBoundingClientRect().width;
-        (newSidebarWidth / 100) * handler.parentNode.getBoundingClientRect().width > 200 ? sidebar.style.width = `${newSidebarWidth}%` :  sidebar.style.width = "200px";
+        let newSidebarWidthPX = (newSidebarWidth / 100) * handler.parentNode.getBoundingClientRect().width
+        newSidebarWidthPX > 200 ? sidebar.style.width = `${newSidebarWidth}%` :  sidebar.style.width = "200px";
+
+        // Calculates how many letters of the files and folders names should be show
+        // To calculate the sliceIndex we divide the newSidebarWidthPX by the font size in PX
+        let currentFolderName = document.getElementById('currentFolderName');
+        window.bridge.sliceMainFolderName(Math.floor(newSidebarWidthPX/14), currentFolderName);
 
         // Changes the cursor appereance
         handler.style.cursor = 'col-resize';

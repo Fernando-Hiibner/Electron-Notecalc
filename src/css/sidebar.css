@@ -21,6 +21,7 @@
     float: right;
     cursor: pointer;
     background-color: white;
+    z-index: 10;
 }
 
 .sidebarHeaderButtons:hover {
