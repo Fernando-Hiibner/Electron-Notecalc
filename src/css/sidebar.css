@@ -39,7 +39,7 @@
     justify-content: flex-end;
 }
 
-#newFileButton ,#newFolderButton {
+#newFileButton ,#newFolderButton, #deleteButton {
     margin-right: 2px;
 }
 
@@ -50,6 +50,11 @@
 
 #newFolderButton::before {
     content: '\f756';
+    font-family: 'Droid Sans Mono';
+}
+
+#deleteButton::before {
+    content: '\f1f8';
     font-family: 'Droid Sans Mono';
 }
 
