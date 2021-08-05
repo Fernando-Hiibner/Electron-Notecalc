@@ -220,15 +220,38 @@ function refreshDirectory(directory, node) {
     }
 }
 
+function getElOffset(el) {
+    const rect = el.getBoundingClientRect();
+    return {
+        left: rect.left + window.scrollX,
+        top: rect.top + window.scrollY
+    };
+}
+
+function innerDimensions(node) {
+    var computedStyle = getComputedStyle(node)
+
+    let width = node.clientWidth // width with padding
+    let height = node.clientHeight // height with padding
+
+    height -= parseFloat(computedStyle.paddingTop) + parseFloat(computedStyle.paddingBottom)
+    width -= parseFloat(computedStyle.paddingLeft) + parseFloat(computedStyle.paddingRight)
+    return { height, width }
+  }
+
 function nameInputFunc(node, margin, writeFunction) {
+    const sidebar = document.getElementById('sidebar')
     let nameInput = document.createElement('input');
     nameInput.setAttribute('type', 'text');
     node.appendChild(nameInput);
     // FIXME Ver esse bangue aqui, ele ta "funcionando, UNICO problema é ele focar fora do campo de visão e dedar o hover, fazer ele ter o tamanho descente
     nameInput.style.marginLeft = margin;
+    nameInput.style.width = `${parseInt(String(innerDimensions(node.lastChild.firstChild).width))}px`;
+    let offsetTop = getElOffset(nameInput).top;
     nameInput.focus({
-        preventScrollX: true
+        preventScroll: true
     });
+    sidebar.scrollTo(0, offsetTop);
     nameInput.addEventListener('focusout', () => {nameInput.remove()})
     nameInput.addEventListener('keydown', (event) => {
         if(event.key === 'Enter') {

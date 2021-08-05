@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Calculates how many letters of the files and folders names should be show
         // To calculate the sliceIndex we divide the newSidebarWidthPX by the font size in PX
+        // FIXME isso só pode mudar se o sidebar width realmente mudar
         let currentFolderName = document.getElementById('currentFolderName');
         window.bridge.sliceMainFolderName(Math.floor(newSidebarWidthPX/14), currentFolderName);
 
