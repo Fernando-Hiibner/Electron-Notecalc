@@ -1,4 +1,4 @@
-const {readDirectory, readUpperDirectory, refreshDirectory} = require('sidebar');
+const {readDirectory, readUpperDirectory, refreshDirectory, newFileButtonClickCallback, newFolderButtonClickCallback, deleteButtonClickCallback} = require('sidebar');
 const {toolbarOptions, showColorPicker} = require('quill-increment');
 const highlight = require('highlight.js');
 const {contextBridge} = require('electron');
@@ -73,97 +73,19 @@ window.addEventListener('DOMContentLoaded', () => {
     newFileButton.setAttribute('class', 'sidebarHeaderButtons');
     newFileButton.setAttribute('id', 'newFileButton');
     newFileButton.addEventListener('click', () => {
-        if(document.getElementsByClassName('selected')[0]  !== undefined) {
-            let el = document.getElementsByClassName('selected')[0]
-            fs.lstat(el.id, (err, stat) => {
-                if(err) throw err;
-                if(stat && stat.isDirectory()) {
-                    fs.writeFile(path.join(el.id, "Baozi.txt"), "OI!", (err) => {
-                        if(err) console.log(err);
-                        else {
-                            refreshDirectory(el.id, el.parentElement);
-                        }
-                    });
-                }
-                else if(stat && stat.isFile()) {
-                    fs.writeFile(path.join(path.dirname(el.id), "Baozi.txt"), "OI!", (err) => {
-                        if(err) console.log(err);
-                        else {
-                            let elFolder = document.getElementById(path.dirname(el.id));
-                            if(elFolder === null) {
-                                refreshDirectory(path.dirname(el.id), fatherNode);
-                            }
-                            else {
-                                refreshDirectory(path.dirname(el.id), elFolder.parentElement);
-                            }
-                        }
-                    });
-                }
-            })
-        }
-        else {
-            fs.writeFile(path.join(process.cwd(), "Baozi.txt"), "OI!", (err) => {
-                if(err) console.log(err);
-                else refreshDirectory(process.cwd(), fatherNode);
-            })
-        }
+        newFileButtonClickCallback(fatherNode);
     })
 
     newFolderButton.setAttribute('class', 'sidebarHeaderButtons');
     newFolderButton.setAttribute('id', 'newFolderButton');
     newFolderButton.addEventListener('click', () => {
-        if(document.getElementsByClassName('selected')[0]  !== undefined) {
-            let el = document.getElementsByClassName('selected')[0]
-            fs.lstat(el.id, (err, stat) => {
-                if(err) throw err;
-                if(stat && stat.isDirectory()) {
-                    fs.mkdir(path.join(el.id, "Baozi"), (err) => {
-                        if(err) console.log(err);
-                        else {
-                            refreshDirectory(el.id, el.parentElement);
-                        }
-                    });
-                }
-                else if(stat && stat.isFile()) {
-                    fs.mkdir(path.join(path.dirname(el.id), "Baozi"), (err) => {
-                        let elFolder = document.getElementById(path.dirname(el.id));
-                        if(elFolder === null) {
-                            refreshDirectory(path.dirname(el.id), fatherNode);
-                        }
-                        else {
-                            refreshDirectory(path.dirname(el.id), elFolder.parentElement);
-                        }
-                    });
-                }
-            })
-        }
-        else {
-            fs.mkdir(path.join(process.cwd(), "Baozi"), (err) => {
-                if (err) console.log(err);
-                else refreshDirectory(process.cwd(), fatherNode);
-            });
-        }
+        newFolderButtonClickCallback(fatherNode);
     })
 
     deleteButton.setAttribute('class', 'sidebarHeaderButtons');
     deleteButton.setAttribute('id', 'deleteButton');
     deleteButton.addEventListener('click', () => {
-        if(document.getElementsByClassName('selected')[0]  !== undefined) {
-            let el = document.getElementsByClassName('selected')[0];
-            (async () => {
-                try {
-                    await del(el.id);
-                }
-                catch(err) {
-                    console.log(err);
-                }
-            })();
-            refreshDirectory(process.cwd(), fatherNode);
-            console.log(fatherNode);
-        }
-        else {
-            console.log("Hoje o deletar vai ser em número porque o arquivo não foi selecionado!")
-        }
+        deleteButtonClickCallback(fatherNode);
     })
 
     sidebarHeaderButtonsDiv.appendChild(newFileButton);
