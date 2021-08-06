@@ -13,13 +13,10 @@
 }
 
 #sidebarHeaderDiv {
+    background-color: white;
+    position: sticky;
     display: flex;
-}
-
-.sticky {
-    position: fixed;
     top: 0;
-    width: 100%
 }
 
 .sidebarHeaderButtons {

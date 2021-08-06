@@ -4,8 +4,6 @@ const highlight = require('highlight.js');
 const {contextBridge} = require('electron');
 const Quill = require('quill');
 const path = require('path');
-const del = require('del');
-const fs = require('fs');
 
 
 function sliceMainFolderName(sliceIndex, currentFolderName) {

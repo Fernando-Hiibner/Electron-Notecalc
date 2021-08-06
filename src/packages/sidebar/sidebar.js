@@ -1,5 +1,4 @@
 const path = require('path');
-const del = require('del');
 const fs = require('fs');
 
 function recursiveAsyncReadDir(directory, done) {
@@ -253,7 +252,7 @@ function nameInputFunc(node, margin, writeFunction) {
     });
     sidebar.scrollTo(0, offsetTop);
     nameInput.addEventListener('focusout', () => {
-        try {nameInput.remove} catch(err) {console.log(err)};
+        try {nameInput.remove()} catch(err) {console.log(err)};
     });
     nameInput.addEventListener('keydown', (event) => {
         if(event.key === 'Enter') {
@@ -264,7 +263,7 @@ function nameInputFunc(node, margin, writeFunction) {
             writeFunction(nameInput);
         }
         else if(event.key === 'Escape') {
-            try {nameInput.remove} catch(err) {console.log(err)};
+            try {nameInput.remove()} catch(err) {console.log(err)};
             return;
         }
     })
@@ -280,10 +279,10 @@ function newFileButtonClickCallback(fatherNode) {
                     fs.writeFile(path.join(el.id, nameInput.value), "", (err) => {
                         if(err) {
                             alert(err);
-                            try {nameInput.remove} catch(err) {console.log(err)};
+                            try {nameInput.remove()} catch(err) {console.log(err)};
                         }
                         else {
-                            try {nameInput.remove} catch(err) {console.log(err)};
+                            try {nameInput.remove()} catch(err) {console.log(err)};
                             refreshDirectory(el.id, el.parentElement);
                         }
                     });
@@ -302,10 +301,10 @@ function newFileButtonClickCallback(fatherNode) {
                     fs.writeFile(path.join(path.dirname(el.id), nameInput.value), "", (err) => {
                         if(err) {
                             alert(err);
-                            try {nameInput.remove} catch(err) {console.log(err)};
+                            try {nameInput.remove()} catch(err) {console.log(err)};
                         }
                         else {
-                            try {nameInput.remove} catch(err) {console.log(err)};
+                            try {nameInput.remove()} catch(err) {console.log(err)};
                             refreshDirectory(path.dirname(el.id), anchorNode)
                         }
                     });
@@ -318,10 +317,10 @@ function newFileButtonClickCallback(fatherNode) {
             fs.writeFile(path.join(process.cwd(), nameInput.value), "", (err) => {
                 if(err) {
                     alert(err);
-                    try {nameInput.remove} catch(err) {console.log(err)};
+                    try {nameInput.remove()} catch(err) {console.log(err)};
                 }
                 else {
-                    try {nameInput.remove} catch(err) {console.log(err)};
+                    try {nameInput.remove()} catch(err) {console.log(err)};
                     refreshDirectory(process.cwd(), fatherNode);
                 }
             })
@@ -339,10 +338,10 @@ function newFolderButtonClickCallback(fatherNode) {
                     fs.mkdir(path.join(el.id, nameInput.value), (err) => {
                         if(err) {
                             alert(err);
-                            try {nameInput.remove} catch(err) {console.log(err)};
+                            try {nameInput.remove()} catch(err) {console.log(err)};
                         }
                         else {
-                            try {nameInput.remove} catch(err) {console.log(err)};
+                            try {nameInput.remove()} catch(err) {console.log(err)};
                             refreshDirectory(el.id, el.parentElement);
                         }
                     });
@@ -361,10 +360,10 @@ function newFolderButtonClickCallback(fatherNode) {
                     fs.mkdir(path.join(path.dirname(el.id), nameInput.value), (err) => {
                         if(err) {
                             alert(err);
-                            try {nameInput.remove} catch(err) {console.log(err)};
+                            try {nameInput.remove()} catch(err) {console.log(err)};
                         }
                         else {
-                            try {nameInput.remove} catch(err) {console.log(err)};
+                            try {nameInput.remove()} catch(err) {console.log(err)};
                             refreshDirectory(path.dirname(el.id), anchorNode);
                         }
                     });
@@ -377,10 +376,10 @@ function newFolderButtonClickCallback(fatherNode) {
             fs.mkdir(path.join(process.cwd(), nameInput.value), (err) => {
                 if (err) {
                     alert(err);
-                    try {nameInput.remove} catch(err) {console.log(err)};
+                    try {nameInput.remove()} catch(err) {console.log(err)};
                 }
                 else {
-                    try {nameInput.remove} catch(err) {console.log(err)};
+                    try {nameInput.remove()} catch(err) {console.log(err)};
                     refreshDirectory(process.cwd(), fatherNode);
                 }
             });
