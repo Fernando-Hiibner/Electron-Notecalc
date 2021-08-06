@@ -1,8 +1,26 @@
-// Todo
-TODO Poder criar o nome do arquivo/pasta, e multipla seleção, sofrer basicamente.
-TODO Tentar implementar o slice name pras pastas e arquivos além do master.
+// Fazendo
+TODO Tirar as seleções da sidebar quando ela perder o foco
 
-// Fixme
-FIXME A multipla seleção deleta os arquivos selecionados, mas quando cria, considera só o ultimo selecionado e não todos, mesma coisa na hora de renomear.
-FIXME Resolver o sliceMainFolderName quando da upperDirectory com espaço suficiente pro nome e ele corta.
-FIXME Resolver o BO da scrollBar cagando o role da sliceMainFolderName.
+// Todo / Fixme | Prioridade -> 1
+TODO Multipla seleção:
+     TODO Seleção com Shift
+     FIXME Manter a seleção após o Refresh
+     FIXME Seleção com Control não está saindo completamente após fazer uma seleção sem Control, sempre sobra uma
+     FIXME Criar uma lista de selecionados ou algo do genero, pra saber exatamente quem foi o ultimo selecionado, da forma que ta agora ele pega por ordem de node
+TODO Renomear pasta
+
+// Todo / Fixme | Prioridade -> 2
+TODO Implementar o sliceMainFolderName para todas as pastas e arquivos
+     OBS Dificuldade disso é no renderer, como fazer isso iterar direito, talvez API de contextBridge
+TODO Implementar um recursiveDepthCalc para calcular a margem do nameInput
+     OBS Da forma que ta agora ele fica no depth to pai, mas como o arquivo / pasta criado por ele será filho, ele deve ter depth de filho
+TODO Menu de contexto na sidebar
+     OBS Muito importante, está em prioridade 2 apenas porque os de prioridade 1 são bugs e implementações necessárias pra ser a base desse e outros
+
+// Todo / Fixme | Prioridade -> 3
+TODO Navegação pela sidebar com as setas do teclado, enter para simular o clique, delete para deletar e f2 para renomear
+     OBS Obviamente compativel com o Control e o Shift, feito pra ser uma outra forma de navegar pela sidebar
+
+// DONE (06/08/2021 -> xx/xx/xxxx)
+FIXED Resolver o sliceMainFolderName quando da upperDirectory com espaço suficiente pro nome e ele corta.
+FIXED Resolver o BO da scrollBar cagando o role da sliceMainFolderName.

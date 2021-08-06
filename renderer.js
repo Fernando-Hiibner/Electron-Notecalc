@@ -34,13 +34,21 @@ document.addEventListener('DOMContentLoaded', function() {
         // Sets the new size of the sidebar
         const newSidebarWidth = (sidebarWidth + distMouseX) * 100 / handler.parentNode.getBoundingClientRect().width;
         let newSidebarWidthPX = (newSidebarWidth / 100) * handler.parentNode.getBoundingClientRect().width
-        newSidebarWidthPX > 200 ? sidebar.style.width = `${newSidebarWidth}%` :  sidebar.style.width = "200px";
-
-        // Calculates how many letters of the files and folders names should be show
-        // To calculate the sliceIndex we divide the newSidebarWidthPX by the font size in PX
-        // FIXME isso só pode mudar se o sidebar width realmente mudar
-        let currentFolderName = document.getElementById('currentFolderName');
-        window.bridge.sliceMainFolderName(Math.floor(newSidebarWidthPX/14), currentFolderName);
+        if(newSidebarWidthPX > 200 && newSidebarWidth <= 80) {
+            // Calculates how many letters of the files and folders names should be show
+            // Formula: floor of ((newSidebarWidthPX - scrollbarWidth)/fontSizeInPX)-numberOfDots
+            let currentFolderName = document.getElementById('currentFolderName');
+            window.bridge.sliceMainFolderName(Math.floor((newSidebarWidthPX-10)/14)-3, currentFolderName);
+            sidebar.style.width = `${newSidebarWidth}%`;
+        }
+        else if (newSidebarWidth > 80) {
+            let currentFolderName = document.getElementById('currentFolderName');
+            window.bridge.sliceMainFolderName(Math.floor((newSidebarWidthPX-10)/14)-3, currentFolderName);
+            sidebar.style.width = "80%";
+        }
+        else {
+            sidebar.style.width = "200px";
+        }
 
         // Changes the cursor appereance
         handler.style.cursor = 'col-resize';
@@ -69,6 +77,16 @@ document.addEventListener('DOMContentLoaded', function() {
         document.removeEventListener('mousemove', handleMouseMove);
         document.removeEventListener('mouseup', handleMouseUp);
     };
+
+    // FIXME isso não ta funcionando, esse ai é uma tentativa de tirar as seleções
+    sidebar.addEventListener('focusout', () => {
+        let selection = document.getElementsByClassName('selected');
+        if(selections[0] !== undefined){
+            for(let i = 0; i < selection.length; i++) {
+                selection[i].classList.toggle('selected');
+            }
+        }
+    })
 
     handler.addEventListener('mousedown', handleMouseDown);
 })

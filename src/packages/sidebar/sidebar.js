@@ -72,7 +72,6 @@ function readDirectory(directory, node, openFolders = [], selectionIds = []) {
                     if(document.getElementsByClassName('selected')[0] !== undefined && !event.ctrlKey) {
                         let selection = document.getElementsByClassName('selected')
                         for(let i = 0; i < selection.length; i++) {
-                            console.log(selection[i]);
                             selection[i].classList.toggle('selected');
                         }
                     }
@@ -108,7 +107,6 @@ function readDirectory(directory, node, openFolders = [], selectionIds = []) {
                     if(document.getElementsByClassName('selected')[0]  !== undefined && !event.ctrlKey) {
                         let selection = document.getElementsByClassName('selected')
                         for(let i = 0; i < selection.length; i++) {
-                            console.log(selection[i]);
                             selection[i].classList.toggle('selected');
                         }
                     }
@@ -197,12 +195,14 @@ function readUpperDirectory(upperDirectory, currentDirectory, fatherNode, folder
             });
         }
     });
+
+    // Calculating the new folder name
     process.chdir(upperDirectory);
     if(path.basename(process.cwd()).length <= 10) {
         folderNameText.innerText = path.basename(process.cwd()).toUpperCase();
     }
     else {
-        folderNameText.innerText = path.basename(process.cwd()).toUpperCase().slice(0, 10) + "...";
+        folderNameText.innerText = path.basename(process.cwd()).toUpperCase().slice(0, Math.floor((sidebar.getBoundingClientRect().width-10)/14)-3) + "...";
     }
     return newFatherNode;
 }
@@ -250,25 +250,13 @@ function getElOffset(el) {
     };
 }
 
-function innerDimensions(node) {
-    var computedStyle = window.getComputedStyle(node)
-
-    let width = node.clientWidth // width with padding
-    let height = node.clientHeight // height with padding
-
-    height -= parseFloat(computedStyle.paddingTop) + parseFloat(computedStyle.paddingBottom)
-    width -= parseFloat(computedStyle.paddingLeft) + parseFloat(computedStyle.paddingRight)
-    return { height, width }
-  }
-
 function nameInputFunc(node, margin, writeFunction) {
     const sidebar = document.getElementById('sidebar')
     let nameInput = document.createElement('input');
-    let anchorNode = node.id === 'fatherNode' ? node.firstChild.firstChild : node.firstChild;
     nameInput.setAttribute('type', 'text');
     node.appendChild(nameInput);
     nameInput.style.marginLeft = margin;
-    nameInput.style.width = `${parseInt(String(innerDimensions(anchorNode).width))}px`;
+    nameInput.style.width = `calc(100% - ${margin})`
     let offsetTop = getElOffset(nameInput).top;
     nameInput.focus({
         preventScroll: true
