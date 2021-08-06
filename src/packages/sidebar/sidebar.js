@@ -229,7 +229,7 @@ function getElOffset(el) {
 }
 
 function innerDimensions(node) {
-    var computedStyle = getComputedStyle(node)
+    var computedStyle = window.getComputedStyle(node)
 
     let width = node.clientWidth // width with padding
     let height = node.clientHeight // height with padding
@@ -242,17 +242,19 @@ function innerDimensions(node) {
 function nameInputFunc(node, margin, writeFunction) {
     const sidebar = document.getElementById('sidebar')
     let nameInput = document.createElement('input');
+    let anchorNode = node.id === 'fatherNode' ? node.firstChild.firstChild : node.firstChild;
     nameInput.setAttribute('type', 'text');
     node.appendChild(nameInput);
-    // FIXME Ver esse bangue aqui, ele ta "funcionando, UNICO problema é ele focar fora do campo de visão e dedar o hover, fazer ele ter o tamanho descente
     nameInput.style.marginLeft = margin;
-    nameInput.style.width = `${parseInt(String(innerDimensions(node.lastChild.firstChild).width))}px`;
+    nameInput.style.width = `${parseInt(String(innerDimensions(anchorNode).width))}px`;
     let offsetTop = getElOffset(nameInput).top;
     nameInput.focus({
         preventScroll: true
     });
     sidebar.scrollTo(0, offsetTop);
-    nameInput.addEventListener('focusout', () => {nameInput.remove()})
+    nameInput.addEventListener('focusout', () => {
+        try {nameInput.remove} catch(err) {console.log(err)};
+    });
     nameInput.addEventListener('keydown', (event) => {
         if(event.key === 'Enter') {
             if(nameInput.value === "") {
@@ -262,7 +264,7 @@ function nameInputFunc(node, margin, writeFunction) {
             writeFunction(nameInput);
         }
         else if(event.key === 'Escape') {
-            nameInput.remove();
+            try {nameInput.remove} catch(err) {console.log(err)};
             return;
         }
     })
@@ -278,11 +280,11 @@ function newFileButtonClickCallback(fatherNode) {
                     fs.writeFile(path.join(el.id, nameInput.value), "", (err) => {
                         if(err) {
                             alert(err);
-                            nameInput.remove();
+                            try {nameInput.remove} catch(err) {console.log(err)};
                         }
                         else {
+                            try {nameInput.remove} catch(err) {console.log(err)};
                             refreshDirectory(el.id, el.parentElement);
-                            nameInput.remove();
                         }
                     });
                 });
@@ -300,11 +302,11 @@ function newFileButtonClickCallback(fatherNode) {
                     fs.writeFile(path.join(path.dirname(el.id), nameInput.value), "", (err) => {
                         if(err) {
                             alert(err);
-                            nameInput.remove();
+                            try {nameInput.remove} catch(err) {console.log(err)};
                         }
                         else {
+                            try {nameInput.remove} catch(err) {console.log(err)};
                             refreshDirectory(path.dirname(el.id), anchorNode)
-                            nameInput.remove();
                         }
                     });
                 })
@@ -316,11 +318,11 @@ function newFileButtonClickCallback(fatherNode) {
             fs.writeFile(path.join(process.cwd(), nameInput.value), "", (err) => {
                 if(err) {
                     alert(err);
-                    nameInput.remove();
+                    try {nameInput.remove} catch(err) {console.log(err)};
                 }
                 else {
+                    try {nameInput.remove} catch(err) {console.log(err)};
                     refreshDirectory(process.cwd(), fatherNode);
-                    nameInput.remove();
                 }
             })
         })
@@ -337,11 +339,11 @@ function newFolderButtonClickCallback(fatherNode) {
                     fs.mkdir(path.join(el.id, nameInput.value), (err) => {
                         if(err) {
                             alert(err);
-                            nameInput.remove();
+                            try {nameInput.remove} catch(err) {console.log(err)};
                         }
                         else {
+                            try {nameInput.remove} catch(err) {console.log(err)};
                             refreshDirectory(el.id, el.parentElement);
-                            nameInput.remove();
                         }
                     });
                 })
@@ -356,14 +358,14 @@ function newFolderButtonClickCallback(fatherNode) {
                     anchorNode = elFolder.parentElement;
                 }
                 nameInputFunc(anchorNode, el.style.paddingLeft, (nameInput) => {
-                    fs.mkdir(path.join(path.dirname(el.id), "Baozi"), (err) => {
+                    fs.mkdir(path.join(path.dirname(el.id), nameInput.value), (err) => {
                         if(err) {
                             alert(err);
-                            nameInput.remove();
+                            try {nameInput.remove} catch(err) {console.log(err)};
                         }
                         else {
+                            try {nameInput.remove} catch(err) {console.log(err)};
                             refreshDirectory(path.dirname(el.id), anchorNode);
-                            nameInput.remove();
                         }
                     });
                 })
@@ -375,11 +377,11 @@ function newFolderButtonClickCallback(fatherNode) {
             fs.mkdir(path.join(process.cwd(), nameInput.value), (err) => {
                 if (err) {
                     alert(err);
-                    nameInput.remove();
+                    try {nameInput.remove} catch(err) {console.log(err)};
                 }
                 else {
+                    try {nameInput.remove} catch(err) {console.log(err)};
                     refreshDirectory(process.cwd(), fatherNode);
-                    nameInput.remove();
                 }
             });
         })
@@ -389,15 +391,10 @@ function newFolderButtonClickCallback(fatherNode) {
 function deleteButtonClickCallback(fatherNode) {
     if(document.getElementsByClassName('selected')[0]  !== undefined) {
         let el = document.getElementsByClassName('selected')[0];
-        (async () => {
-            try {
-                await del(el.id);
-                refreshDirectory(process.cwd(), fatherNode);
-            }
-            catch(err) {
-                alert(err);
-            }
-        })();
+        fs.rm(el.id, {recursive: true, force: true}, () => {
+            console.log("BAOZIIII");
+            refreshDirectory(process.cwd(), fatherNode);
+        });
     }
 }
 

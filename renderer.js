@@ -71,4 +71,16 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     handler.addEventListener('mousedown', handleMouseDown);
+
+    let sidebarHeaderDiv = document.getElementById('sidebarHeaderDiv');
+    let sticky = sidebarHeaderDiv.offsetTop;
+    sidebar.onscroll = () => {
+        console.log("Oi")
+        if(window.pageYOffset > sticky) {
+            sidebarHeaderDiv.classList.add('sticky');
+        }
+        else {
+            sidebarHeaderDiv.classList.remove('sticky');
+        }
+    }
 })

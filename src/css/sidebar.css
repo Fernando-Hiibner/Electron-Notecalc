@@ -16,6 +16,12 @@
     display: flex;
 }
 
+.sticky {
+    position: fixed;
+    top: 0;
+    width: 100%
+}
+
 .sidebarHeaderButtons {
     border: 0;
     float: right;

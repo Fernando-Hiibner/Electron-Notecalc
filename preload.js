@@ -1,4 +1,4 @@
-const {readDirectory, readUpperDirectory, refreshDirectory, newFileButtonClickCallback, newFolderButtonClickCallback, deleteButtonClickCallback} = require('sidebar');
+const {readDirectory, readUpperDirectory, newFileButtonClickCallback, newFolderButtonClickCallback, deleteButtonClickCallback} = require('sidebar');
 const {toolbarOptions, showColorPicker} = require('quill-increment');
 const highlight = require('highlight.js');
 const {contextBridge} = require('electron');
@@ -28,7 +28,7 @@ contextBridge.exposeInMainWorld('bridge', {
 
 window.addEventListener('DOMContentLoaded', () => {
     // Change cwd to test folder
-    process.chdir('C:\\Users\\fernandoaffonso\\Desktop\\Pessoal\\Estudos\\Javascript\\Electron 2 Test Folder');
+    // process.chdir('C:\\Users\\fernandoaffonso\\Desktop\\Pessoal\\Estudos\\Javascript\\Electron 2 Test Folder');
     // Create quill
     let editor = new Quill('.editor', {
         theme: 'snow',
