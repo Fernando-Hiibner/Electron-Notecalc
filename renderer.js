@@ -79,12 +79,10 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     // FIXME isso não ta funcionando, esse ai é uma tentativa de tirar as seleções
-    sidebar.addEventListener('focusout', () => {
-        let selection = document.getElementsByClassName('selected');
-        if(selections[0] !== undefined){
-            for(let i = 0; i < selection.length; i++) {
-                selection[i].classList.toggle('selected');
-            }
+    document.getElementsByTagName('BODY')[0].addEventListener('focusout', () => {
+        let selections = document.getElementsByClassName('selected');
+        while(selections.length >= 1) {
+            selections[0].classList.toggle('selected');
         }
     })
 

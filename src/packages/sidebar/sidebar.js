@@ -70,9 +70,9 @@ function readDirectory(directory, node, openFolders = [], selectionIds = []) {
                     }
 
                     if(document.getElementsByClassName('selected')[0] !== undefined && !event.ctrlKey) {
-                        let selection = document.getElementsByClassName('selected')
-                        for(let i = 0; i < selection.length; i++) {
-                            selection[i].classList.toggle('selected');
+                        let selections = document.getElementsByClassName('selected')
+                        while(selections.length >= 1) {
+                            selections[0].classList.toggle('selected');
                         }
                     }
                     folderSPAN.classList.toggle('selected');
@@ -105,9 +105,9 @@ function readDirectory(directory, node, openFolders = [], selectionIds = []) {
                 fileSPAN.style.paddingLeft = `${depth * 0.5}cm`;
                 fileSPAN.addEventListener('click', (event) => {
                     if(document.getElementsByClassName('selected')[0]  !== undefined && !event.ctrlKey) {
-                        let selection = document.getElementsByClassName('selected')
-                        for(let i = 0; i < selection.length; i++) {
-                            selection[i].classList.toggle('selected');
+                        let selections = document.getElementsByClassName('selected')
+                        while(selections.length >= 1) {
+                            selections[0].classList.toggle('selected');
                         }
                     }
                     fileSPAN.classList.toggle('selected');
