@@ -21,6 +21,9 @@ TODO Menu de contexto na sidebar
 TODO Navegação pela sidebar com as setas do teclado, enter para simular o clique, delete para deletar e f2 para renomear
      OBS Obviamente compativel com o Control e o Shift, feito pra ser uma outra forma de navegar pela sidebar
 
+// Todo / Fixme | Prioridade -> 90
+TODO Por o Spotify, WhatsApp, Telegram, Discord e etc numa barra lateral (Tipo o Opera)
+
 // DONE (06/08/2021 -> xx/xx/xxxx)
 FIXED Resolver o sliceMainFolderName quando da upperDirectory com espaço suficiente pro nome e ele corta.
 FIXED Resolver o BO da scrollBar cagando o role da sliceMainFolderName.
