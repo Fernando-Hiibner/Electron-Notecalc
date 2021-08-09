@@ -1,4 +1,4 @@
-const {readDirectory, readUpperDirectory, newFileButtonClickCallback, newFolderButtonClickCallback, deleteButtonClickCallback} = require('sidebar');
+const {readDirectory, readUpperDirectory, newFileButtonClickCallback, newFolderButtonClickCallback, deleteButtonClickCallback, refreshDirectory} = require('sidebar');
 const {toolbarOptions, showColorPicker} = require('quill-increment');
 const highlight = require('highlight.js');
 const {contextBridge} = require('electron');
@@ -7,12 +7,12 @@ const path = require('path');
 
 
 function sliceMainFolderName(sliceIndex, currentFolderName) {
-    if(path.basename(process.cwd()).length < sliceIndex || path.basename(process.cwd()).length === sliceIndex) {
+    if(path.basename(process.cwd()).length <= 10 || path.basename(process.cwd()).length <= sliceIndex) {
         currentFolderName.innerText = path.basename(process.cwd()).toUpperCase();
     }
     else {
-        if(sliceIndex < 10) {
-            sliceIndex = 10;
+        if(sliceIndex < 8) {
+            sliceIndex = 8;
         }
         currentFolderName.innerText = path.basename(process.cwd()).toUpperCase().slice(0, sliceIndex) + "...";
     }
@@ -64,7 +64,8 @@ window.addEventListener('DOMContentLoaded', () => {
     let sidebarHeaderButtonsDiv = document.createElement('div')
        ,newFileButton = document.createElement('button')
        ,newFolderButton = document.createElement('button')
-       ,deleteButton = document.createElement('button');
+       ,collapseButton = document.createElement('button')
+       ,refreshButton = document.createElement('button');
 
     sidebarHeaderButtonsDiv.setAttribute('id', 'sidebarHeaderButtonsDiv');
 
@@ -80,15 +81,30 @@ window.addEventListener('DOMContentLoaded', () => {
         newFolderButtonClickCallback(fatherNode);
     })
 
-    deleteButton.setAttribute('class', 'sidebarHeaderButtons');
-    deleteButton.setAttribute('id', 'deleteButton');
-    deleteButton.addEventListener('click', () => {
-        deleteButtonClickCallback(fatherNode);
+
+    refreshButton.setAttribute('class', 'sidebarHeaderButtons');
+    refreshButton.setAttribute('id', 'refreshButton');
+    refreshButton.addEventListener('click', () => {
+        refreshDirectory(process.cwd(), fatherNode);
+    });
+
+    collapseButton.setAttribute('class', 'sidebarHeaderButtons');
+    collapseButton.setAttribute('id', 'collapseButton');
+    collapseButton.addEventListener('click', () => {
+        let activeSpans = document.getElementsByClassName('folder-down');
+        while(activeSpans.length >= 1) {
+            activeSpans[0].classList.remove('folder-down');
+        }
+        let openNests = document.getElementsByClassName('nested active');
+        while(openNests.length >= 1) {
+            openNests[0].classList.remove('active');
+        }
     })
 
     sidebarHeaderButtonsDiv.appendChild(newFileButton);
     sidebarHeaderButtonsDiv.appendChild(newFolderButton);
-    sidebarHeaderButtonsDiv.appendChild(deleteButton);
+    sidebarHeaderButtonsDiv.appendChild(refreshButton);
+    sidebarHeaderButtonsDiv.appendChild(collapseButton);
 
     sidebarHeaderDiv.appendChild(upperFolderButton)
     sidebarHeaderDiv.appendChild(currentFolderName);

@@ -38,15 +38,16 @@ document.addEventListener('DOMContentLoaded', function() {
             // Calculates how many letters of the files and folders names should be show
             // Formula: floor of ((newSidebarWidthPX - scrollbarWidth)/fontSizeInPX)-numberOfDots
             let currentFolderName = document.getElementById('currentFolderName');
-            window.bridge.sliceMainFolderName(Math.floor((newSidebarWidthPX-10)/14)-3, currentFolderName);
+            window.bridge.sliceMainFolderName(Math.floor((newSidebarWidthPX-40)/14)-3, currentFolderName);
             sidebar.style.width = `${newSidebarWidth}%`;
         }
         else if (newSidebarWidth > 80) {
             let currentFolderName = document.getElementById('currentFolderName');
-            window.bridge.sliceMainFolderName(Math.floor((newSidebarWidthPX-10)/14)-3, currentFolderName);
+            window.bridge.sliceMainFolderName(Math.floor((newSidebarWidthPX-40)/14)-3, currentFolderName);
             sidebar.style.width = "80%";
         }
         else {
+            window.bridge.sliceMainFolderName(Math.floor((200-40)/14)-3, currentFolderName);
             sidebar.style.width = "200px";
         }
 

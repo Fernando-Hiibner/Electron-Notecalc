@@ -80,7 +80,7 @@ function readDirectory(directory, node, openFolders = [], selectionIds = []) {
                 if(openFolders.includes(folderSPAN.id)) {
                     // Check if this folder is already loaded, if not, load it
                     if (!folderSPAN.parentElement.querySelector(".nested")) {
-                        readDirectory(path.join(directory, path.basename(folder)), folderLI, openFolders);
+                        readDirectory(path.join(directory, path.basename(folder)), folderLI, openFolders, selectionIds);
                     }
                     folderSPAN.parentElement.querySelector(".nested").classList.toggle("active");
                     folderSPAN.classList.toggle("folder-down");
@@ -209,7 +209,7 @@ function readUpperDirectory(upperDirectory, currentDirectory, fatherNode, folder
         folderNameText.innerText = path.basename(process.cwd()).toUpperCase();
     }
     else {
-        folderNameText.innerText = path.basename(process.cwd()).toUpperCase().slice(0, Math.floor((sidebar.getBoundingClientRect().width-10)/14)-3) + "...";
+        folderNameText.innerText = path.basename(process.cwd()).toUpperCase().slice(0, Math.floor((sidebar.getBoundingClientRect().width-40)/14)-3) + "...";
     }
     return newFatherNode;
 }
@@ -219,7 +219,7 @@ function refreshDirectory(directory, node) {
     let selectionIds = [];
     if(selections[0] !== undefined) {
         for(let i = 0; i < selections.length; i++) {
-            selectionIds.push(selections[i]);
+            selectionIds.push(selections[i].id);
         }
     }
     let childs = node.getElementsByTagName('UL');

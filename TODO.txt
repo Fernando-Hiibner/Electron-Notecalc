@@ -1,12 +1,9 @@
 // Fazendo
 
-// Todo / Fixme | Prioridade -> 1
-TODO Implementar botão de refresh
 TODO Multipla seleção:
      TODO Seleção com Shift
-     FIXME Manter a seleção após o Refresh
-     FIXME Seleção com Control não está saindo completamente após fazer uma seleção sem Control, sempre sobra uma
      FIXME Criar uma lista de selecionados ou algo do genero, pra saber exatamente quem foi o ultimo selecionado, da forma que ta agora ele pega por ordem de node
+// Todo / Fixme | Prioridade -> 1
 TODO Renomear pasta
 
 // Todo / Fixme | Prioridade -> 2
@@ -34,3 +31,8 @@ DONE Tirar as seleções da sidebar quando ela perder o foco
 DONE Implementar o novo click event no readUpperDirectory
      OBS: Inclui o novo sistema de seleção que ele ainda não tem.
 FIXED O sistem de detecção de perda de foco da sidebar ta estranho, ver de arrumar isso
+DONE Implementar botão de refresh
+FIXED Refresh ta estranho, não ta mantendo as seleções direito
+FIXED Seleção com Control não está saindo completamente após fazer uma seleção sem Control, sempre sobra uma
+DONE Collapse all folders in explorer button
+FIXED Tamanho do texto que tem o nome da pasta atual ta zuado agora que tem 4 botões
