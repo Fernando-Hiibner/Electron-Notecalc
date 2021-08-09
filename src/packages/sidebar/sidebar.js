@@ -159,17 +159,21 @@ function readUpperDirectory(upperDirectory, currentDirectory, fatherNode, folder
                 }
                 depth = recursiveDepthCalc(folderLI, 0);
                 folderSPAN.style.paddingLeft = `${depth * 0.5}cm`
-                folderSPAN.addEventListener('click', () => {
-                    if (!folderSPAN.parentElement.querySelector(".nested")) {
-                        readDirectory(path.join(upperDirectory, path.basename(folder)), folderLI);
-                    }
-                    folderSPAN.parentElement.querySelector(".nested").classList.toggle("active");
-                    if (folderSPAN.classList[0] !== "folder-down") {
+                folderSPAN.addEventListener('click', (event) => {
+                    // Check if this folder is already loaded, if not, load it
+                    if(!event.ctrlKey) {
+                        if (!folderSPAN.parentElement.querySelector(".nested")) {
+                            readDirectory(path.join(upperDirectory, path.basename(folder)), folderLI);
+                        }
+                        folderSPAN.parentElement.querySelector(".nested").classList.toggle("active");
                         folderSPAN.classList.toggle("folder-down");
                     }
 
-                    if(document.getElementsByClassName('selected')[0]  !== undefined) {
-                        document.getElementsByClassName('selected')[0].classList.toggle('selected');
+                    if(document.getElementsByClassName('selected')[0] !== undefined && !event.ctrlKey) {
+                        let selections = document.getElementsByClassName('selected')
+                        while(selections.length >= 1) {
+                            selections[0].classList.toggle('selected');
+                        }
                     }
                     folderSPAN.classList.toggle('selected');
                 });
@@ -186,9 +190,12 @@ function readUpperDirectory(upperDirectory, currentDirectory, fatherNode, folder
                 newFatherNode.appendChild(fileLI);
                 depth = recursiveDepthCalc(fileLI, 0);
                 fileSPAN.style.paddingLeft = `${depth * 0.5}cm`;
-                fileSPAN.addEventListener('click', () => {
-                    if(document.getElementsByClassName('selected')[0] !== undefined) {
-                        document.getElementsByClassName('selected')[0].classList.toggle('selected');
+                fileSPAN.addEventListener('click', (event) => {
+                    if(document.getElementsByClassName('selected')[0]  !== undefined && !event.ctrlKey) {
+                        let selections = document.getElementsByClassName('selected')
+                        while(selections.length >= 1) {
+                            selections[0].classList.toggle('selected');
+                        }
                     }
                     fileSPAN.classList.toggle('selected');
                 });
@@ -283,7 +290,7 @@ function nameInputFunc(node, margin, writeFunction) {
 function newFileButtonClickCallback(fatherNode) {
     if(document.getElementsByClassName('selected')[0]  !== undefined) {
         let el = document.getElementsByClassName('selected')
-        el = el[el.length-1];
+        el = el[el.length-1]; //TRY tentativa de considerar só o ultimo da seleção
         fs.lstat(el.id, (err, stat) => {
             if(err) throw err;
             if(stat && stat.isDirectory()) {
@@ -343,7 +350,7 @@ function newFileButtonClickCallback(fatherNode) {
 function newFolderButtonClickCallback(fatherNode) {
     if(document.getElementsByClassName('selected')[0]  !== undefined) {
         let el = document.getElementsByClassName('selected')
-        el = el[el.length-1];
+        el = el[el.length-1]; //TRY tentativa de considerar só o ultimo da seleção
         fs.lstat(el.id, (err, stat) => {
             if(err) throw err;
             if(stat && stat.isDirectory()) {
@@ -405,6 +412,8 @@ function deleteButtonClickCallback(fatherNode) {
         let el = document.getElementsByClassName('selected');
         for(let i = 0; i < el.length; i++) {
             fs.rm(el[i].id, {recursive: true, force: true}, () => {
+                console.log(process.cwd());
+                console.log(fatherNode);
                 refreshDirectory(process.cwd(), fatherNode); //FIXME ta zuado, não ta mais dando refresh direito, e é só aqui
             });
         }

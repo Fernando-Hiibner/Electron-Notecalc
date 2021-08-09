@@ -78,13 +78,14 @@ document.addEventListener('DOMContentLoaded', function() {
         document.removeEventListener('mouseup', handleMouseUp);
     };
 
-    // FIXME isso não ta funcionando, esse ai é uma tentativa de tirar as seleções
-    document.getElementsByTagName('BODY')[0].addEventListener('focusout', () => {
-        let selections = document.getElementsByClassName('selected');
-        while(selections.length >= 1) {
-            selections[0].classList.toggle('selected');
+    window.addEventListener('click', (event) => {
+        if(!document.getElementById('sidebar').contains(event.target)) {
+            let selections = document.getElementsByClassName('selected');
+            while(selections.length >= 1) {
+                selections[0].classList.toggle('selected');
+            }
         }
-    })
+    });
 
     handler.addEventListener('mousedown', handleMouseDown);
 })

@@ -1,8 +1,4 @@
 // Fazendo
-TODO Implementar o novo click event no readUpperDirectory
-     OBS: Inclui o novo sistema de seleção que ele ainda não tem.
-
-FIXME O sistem de detecção de perda de foco da sidebar ta estranho, ver de arrumar isso
 
 // Todo / Fixme | Prioridade -> 1
 TODO Implementar botão de refresh
@@ -16,8 +12,10 @@ TODO Renomear pasta
 // Todo / Fixme | Prioridade -> 2
 TODO Implementar o sliceMainFolderName para todas as pastas e arquivos
      OBS Dificuldade disso é no renderer, como fazer isso iterar direito, talvez API de contextBridge
+
 TODO Implementar um recursiveDepthCalc para calcular a margem do nameInput
      OBS Da forma que ta agora ele fica no depth to pai, mas como o arquivo / pasta criado por ele será filho, ele deve ter depth de filho
+
 TODO Menu de contexto na sidebar
      OBS Muito importante, está em prioridade 2 apenas porque os de prioridade 1 são bugs e implementações necessárias pra ser a base desse e outros
 
@@ -33,3 +31,6 @@ FIXED Resolver o sliceMainFolderName quando da upperDirectory com espaço sufici
 FIXED Resolver o BO da scrollBar cagando o role da sliceMainFolderName.
 FIXED Tirar as seleções da sidebar quando seleciona sem o Ctrl não ta tirando tudo
 DONE Tirar as seleções da sidebar quando ela perder o foco
+DONE Implementar o novo click event no readUpperDirectory
+     OBS: Inclui o novo sistema de seleção que ele ainda não tem.
+FIXED O sistem de detecção de perda de foco da sidebar ta estranho, ver de arrumar isso

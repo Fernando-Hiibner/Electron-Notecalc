@@ -9,7 +9,7 @@
     user-select: none;
     overflow-x: hidden;
     white-space: nowrap;
-    font-family: 'Droid Sans Mono';
+    font-family: 'Consolas';
 }
 
 #sidebarHeaderDiv {
@@ -93,10 +93,12 @@ ul {
     content: "\f07b";
     margin-right: 6px;
     display: inline-block;
+    font-family: 'Droid Sans Mono';
 }
 
 .folder-down::before {
     content: "\f07c";
+    font-family: 'Droid Sans Mono';
 }
 
 .nested {
