@@ -143,6 +143,61 @@ class Sidebar {
         }
     }
 
+    openFolderCallback(event, directory, folder, li, span) {
+        if(!event.ctrlKey && !event.shiftKey) {
+            if (!span.parentElement.querySelector(".nested")) {
+                this.readDirectory(path.join(directory, path.basename(folder)), li);
+            }
+            span.parentElement.querySelector(".nested").classList.toggle("active");
+            span.classList.toggle("folder-down");
+        }
+    }
+
+    ctrlSelection(event) {
+        if(document.getElementsByClassName('selected')[0] !== undefined && !event.ctrlKey && !event.shiftKey) {
+            let selections = document.getElementsByClassName('selected')
+            while(selections.length >= 1) {
+                selections[0].classList.toggle('selected');
+            }
+            while(this.selectionList.length >= 1) {
+                this.selectionList.pop();
+            }
+        }
+    }
+
+    shiftSelection(event, span) {
+        if(this.selectionList[0] !== undefined && event.shiftKey) {
+            let filesInSelectionRange = document.getElementsByTagName("SPAN");
+            let firstSelectionIndex = undefined;
+            let secondSelectionIndex = undefined;
+            for(let i = 0; i < filesInSelectionRange.length; i++) {
+                if(firstSelectionIndex !== undefined && secondSelectionIndex !== undefined) break;
+                if(filesInSelectionRange[i].id === this.selectionList[0]) {
+                    firstSelectionIndex = i;
+                }
+                else if(filesInSelectionRange[i].id === span.id) {
+                    secondSelectionIndex = i;
+                }
+            }
+            if(firstSelectionIndex < secondSelectionIndex) {
+                for(let i = firstSelectionIndex; i < secondSelectionIndex; i++) {
+                    if(!filesInSelectionRange[i].classList.contains('selected')) {
+                        filesInSelectionRange[i].classList.toggle('selected');
+                        this.selectionList.push(filesInSelectionRange[i].id);
+                    }
+                }
+            }
+            else {
+                for(let i = firstSelectionIndex; i > secondSelectionIndex; i--) {
+                    if(!filesInSelectionRange[i].classList.contains('selected')) {
+                        filesInSelectionRange[i].classList.toggle('selected');
+                        this.selectionList.push(filesInSelectionRange[i].id);
+                    }
+                }
+            }
+        }
+    }
+
     readDirectory(directory, node, openFolders = []) {
         // Create a new UL if node !== 'fatherNode' (node === Sub-directory)
         let nestedUL = undefined;
@@ -172,23 +227,10 @@ class Sidebar {
                     // Folder click event
                     folderSPAN.addEventListener('click', (event) => {
                         // Check if this folder is already loaded, if not, load it
-                        if(!event.ctrlKey) {
-                            if (!folderSPAN.parentElement.querySelector(".nested")) {
-                                this.readDirectory(path.join(directory, path.basename(folder)), folderLI);
-                            }
-                            folderSPAN.parentElement.querySelector(".nested").classList.toggle("active");
-                            folderSPAN.classList.toggle("folder-down");
-                        }
+                        this.openFolderCallback(event, directory, folder, folderLI, folderSPAN);
+                        this.ctrlSelection(event);
+                        this.shiftSelection(event, folderSPAN);
 
-                        if(document.getElementsByClassName('selected')[0] !== undefined && !event.ctrlKey) {
-                            let selections = document.getElementsByClassName('selected')
-                            while(selections.length >= 1) {
-                                selections[0].classList.toggle('selected');
-                            }
-                            while(this.selectionList.length >= 1) {
-                                this.selectionList.pop();
-                            }
-                        }
                         folderSPAN.classList.toggle('selected');
                         this.selectionList.push(folderSPAN.id);
                     });
@@ -200,9 +242,8 @@ class Sidebar {
                         folderSPAN.parentElement.querySelector(".nested").classList.toggle("active");
                         folderSPAN.classList.toggle("folder-down");
                     };
-                    if(this.selectionList.includes(folderSPAN.id)) {
-                        folderSPAN.classList.toggle('selected');
-                    };
+                    // Check if this folder is in selectionList
+                    if(this.selectionList.includes(folderSPAN.id)) folderSPAN.classList.toggle('selected');
                 });
             }
             if (files) {
@@ -218,21 +259,14 @@ class Sidebar {
                     // Calculates how depth the node is, in order to give him correct padding
                     fileSPAN.style.paddingLeft = `${this.recursiveDepthCalc(fileLI, 0) * 0.5}cm`;
                     fileSPAN.addEventListener('click', (event) => {
-                        if(document.getElementsByClassName('selected')[0]  !== undefined && !event.ctrlKey) {
-                            let selections = document.getElementsByClassName('selected')
-                            while(selections.length >= 1) {
-                                selections[0].classList.toggle('selected');
-                            }
-                            while(this.selectionList.length >= 1) {
-                                this.selectionList.pop();
-                            }
-                        }
+                        this.ctrlSelection(event);
+                        this.shiftSelection(event, fileSPAN);
+
                         fileSPAN.classList.toggle('selected');
                         this.selectionList.push(fileSPAN.id);
                     });
-                    if(this.selectionList.includes(fileSPAN.id)) {
-                        fileSPAN.classList.toggle('selected');
-                    };
+                    // Check if this file is in selectionList
+                    if(this.selectionList.includes(fileSPAN.id)) fileSPAN.classList.toggle('selected');
                 });
             }
         });
@@ -283,23 +317,10 @@ class Sidebar {
                     folderSPAN.style.paddingLeft = `${this.recursiveDepthCalc(folderLI, 0) * 0.5}cm`
                     folderSPAN.addEventListener('click', (event) => {
                         // Check if this folder is already loaded, if not, load it
-                        if(!event.ctrlKey) {
-                            if (!folderSPAN.parentElement.querySelector(".nested")) {
-                                this.readDirectory(path.join(upperDirectory, path.basename(folder)), folderLI);
-                            }
-                            folderSPAN.parentElement.querySelector(".nested").classList.toggle("active");
-                            folderSPAN.classList.toggle("folder-down");
-                        }
+                        this.openFolderCallback(event, upperDirectory, folder, folderLI, folderSPAN);
+                        this.ctrlSelection(event);
+                        this.shiftSelection(event, folderSPAN);
 
-                        if(document.getElementsByClassName('selected')[0] !== undefined && !event.ctrlKey) {
-                            let selections = document.getElementsByClassName('selected')
-                            while(selections.length >= 1) {
-                                selections[0].classList.toggle('selected');
-                            }
-                            while(this.electionList.length >= 1) {
-                                this.selectionList.pop();
-                            }
-                        }
                         folderSPAN.classList.toggle('selected');
                         this.selectionList.push(folderSPAN.id);
                     });
@@ -316,15 +337,9 @@ class Sidebar {
                     newFatherNode.appendChild(fileLI);
                     fileSPAN.style.paddingLeft = `${this.recursiveDepthCalc(fileLI, 0) * 0.5}cm`;
                     fileSPAN.addEventListener('click', (event) => {
-                        if(document.getElementsByClassName('selected')[0]  !== undefined && !event.ctrlKey) {
-                            let selections = document.getElementsByClassName('selected')
-                            while(selections.length >= 1) {
-                                selections[0].classList.toggle('selected');
-                            }
-                            while(this.selectionList.length >= 1) {
-                                this.selectionList.pop();
-                            }
-                        }
+                        this.ctrlSelection(event);
+                        this.shiftSelection(event, fileSPAN);
+
                         fileSPAN.classList.toggle('selected');
                         this.selectionList.push(fileSPAN.id);
                     });

@@ -1,10 +1,10 @@
 // Fazendo
-
 TODO Multipla seleção:
      TODO Seleção com Shift
           OBS: Esse é simples, quando aperta o primeiro shift seleciona, 
           OBS: depois no segundo usa, "while(el.nextSinbling != "el selecionado)" e da toggle no select do el, e atribui next sinbling pra ele
-     FIXME Criar uma lista de selecionados ou algo do genero, pra saber exatamente quem foi o ultimo selecionado, da forma que ta agora ele pega por ordem de node
+     FIXED Criar uma lista de selecionados ou algo do genero, pra saber exatamente quem foi o ultimo selecionado, da forma que ta agora ele pega por ordem de node
+
 // Todo / Fixme | Prioridade -> 1
 TODO Renomear pasta
 
