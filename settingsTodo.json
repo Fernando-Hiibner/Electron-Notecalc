@@ -1,0 +1,73 @@
+{
+    "todo-tree.general.showIconsInsteadOfTagsInStatusBar": false,
+    "todo-tree.general.tags": [
+        "BUG",
+        "HACK",
+        "FIXME",
+        "TODO",
+        "TRY",
+        "DONE",
+        "FIXED",
+        "OBS"
+    ],
+    "todo-tree.highlights.defaultHighlight": {
+        "type": "text-and-comment",
+        "icon" : "circle",
+        "gutterIcon": true,
+        "borderRadius": "5px",
+        "foreground": "rgb(191, 191, 191)",
+        "background": "rgb(67, 67, 67)",
+        "iconColour": "rgb(67, 67, 67)"
+    },
+    "todo-tree.highlights.customHighlight": {
+        "BUG": {
+            "icon" : "bug",
+            "background": "rgb(133, 9, 9)",
+            "iconColour": "rgb(133, 9, 9)"
+        },
+        "HACK": {
+            "icon": "code",
+            "background": "rgb(21, 118, 12)",
+            "foreground": "#1e1e1e",
+            "iconColour": "rgb(21, 118, 12)"
+        },
+        "FIXME": {
+            "icon" : "x-circle",
+            "iconColour": "rgb(170, 121, 16)",
+            "background": "rgb(170, 121, 16)"
+        },
+        "TODO": {
+            "icon": "clock",
+            "iconColour": "rgb(29, 83, 135)",
+            "background": "rgb(29, 83, 135)"
+        },
+        "TRY": {
+            "icon": "tools",
+            "iconColour": "rgb(58, 12, 111)",
+            "background": "rgb(58, 12, 111)"
+            // "iconColour": "rgb(10, 174, 144)",
+            // "background": "rgb(10, 174, 144)"
+        },
+        "FIXED": {
+            "icon" : "x-circle",
+            "iconColour" : "rgb(125, 172, 14)",
+            "foreground": "editor.background",
+            "background": "rgb(125, 172, 14)",
+            "hideFromTree": true,
+            "hideFromStatusBar": true
+        },
+        "DONE": {
+            "icon" : "check-circle",
+            "iconColour" : "rgb(38, 170, 26)",
+            "foreground": "editor.background",
+            "background": "rgb(38, 170, 26)",
+            "hideFromTree": true,
+            "hideFromStatusBar": true
+        },
+        "OBS": {
+            "icon": "eye"
+        }
+    },
+    "workbench.colorTheme": "GitHub Dark Default",
+    "todo-tree.general.statusBar": "current file"
+}

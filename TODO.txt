@@ -1,12 +1,11 @@
 // Fazendo
-TODO Multipla seleção:
-     TODO Seleção com Shift
-          OBS: Esse é simples, quando aperta o primeiro shift seleciona, 
-          OBS: depois no segundo usa, "while(el.nextSinbling != "el selecionado)" e da toggle no select do el, e atribui next sinbling pra ele
-     FIXED Criar uma lista de selecionados ou algo do genero, pra saber exatamente quem foi o ultimo selecionado, da forma que ta agora ele pega por ordem de node
+TODO testar a seleção com Shift e implementar a criação de arquivos e pastas usando o ultimo arquivo selecionado como pai
 
-// Todo / Fixme | Prioridade -> 1
+
 TODO Renomear pasta
+TODO Deletar coisas
+OBS: Esses dois é por seleção e atalho no teclado
+// Todo / Fixme | Prioridade -> 1
 
 // Todo / Fixme | Prioridade -> 2
 TODO Implementar o sliceMainFolderName para todas as pastas e arquivos
@@ -38,3 +37,8 @@ FIXED Refresh ta estranho, não ta mantendo as seleções direito
 FIXED Seleção com Control não está saindo completamente após fazer uma seleção sem Control, sempre sobra uma
 DONE Collapse all folders in explorer button
 FIXED Tamanho do texto que tem o nome da pasta atual ta zuado agora que tem 4 botões
+DONE Multipla seleção:
+     DONE Seleção com Shift
+          OBS: Esse é simples, quando aperta o primeiro shift seleciona, 
+          OBS: depois no segundo usa, "while(el.nextSinbling != "el selecionado)" e da toggle no select do el, e atribui next sinbling pra ele
+     FIXED Criar uma lista de selecionados ou algo do genero, pra saber exatamente quem foi o ultimo selecionado, da forma que ta agora ele pega por ordem de node
