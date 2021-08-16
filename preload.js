@@ -1,4 +1,4 @@
-const {readDirectory, readUpperDirectory, newFileButtonClickCallback, newFolderButtonClickCallback, deleteButtonClickCallback, refreshDirectory} = require('sidebar');
+const {readDirectory, readUpperDirectory, newFileButtonClickCallback, newFolderButtonClickCallback, deleteButtonClickCallback, refreshDirectory, focusOutListener, collapseButtonClickCallback} = require('sidebar');
 const {toolbarOptions, showColorPicker} = require('quill-increment');
 const highlight = require('highlight.js');
 const {contextBridge} = require('electron');
@@ -91,14 +91,7 @@ window.addEventListener('DOMContentLoaded', () => {
     collapseButton.setAttribute('class', 'sidebarHeaderButtons');
     collapseButton.setAttribute('id', 'collapseButton');
     collapseButton.addEventListener('click', () => {
-        let activeSpans = document.getElementsByClassName('folder-down');
-        while(activeSpans.length >= 1) {
-            activeSpans[0].classList.remove('folder-down');
-        }
-        let openNests = document.getElementsByClassName('nested active');
-        while(openNests.length >= 1) {
-            openNests[0].classList.remove('active');
-        }
+        collapseButtonClickCallback();
     })
 
     sidebarHeaderButtonsDiv.appendChild(newFileButton);
@@ -124,4 +117,5 @@ window.addEventListener('DOMContentLoaded', () => {
     sidebar.appendChild(fatherNode);
 
     readDirectory(process.cwd(), fatherNode);
+    focusOutListener();
 });

@@ -1,6 +1,8 @@
 const path = require('path');
 const fs = require('fs');
 
+let selectionList = []
+
 function recursiveAsyncReadDir(directory, done) {
     var folders = [];
     var files = [];
@@ -32,10 +34,11 @@ function recursiveDepthCalc(el, sum) {
     }
 }
 
-function readDirectory(directory, node, openFolders = [], selectionIds = []) {
+function readDirectory(directory, node, openFolders = []) {
     // Create a new UL if node !== 'fatherNode' (node === Sub-directory)
+    let nestedUL = undefined;
     if (node.id !== 'fatherNode') {
-        var nestedUL = document.createElement('ul');
+        nestedUL = document.createElement('ul');
         nestedUL.setAttribute('class', 'nested');
         node.appendChild(nestedUL);
     }
@@ -56,8 +59,7 @@ function readDirectory(directory, node, openFolders = [], selectionIds = []) {
                 folderLI.appendChild(folderSPAN);
                 nestedUL.appendChild(folderLI);
                 // Calculates how depth the node is, in order to give him correct padding
-                depth = recursiveDepthCalc(folderLI, 0);
-                folderSPAN.style.paddingLeft = `${depth * 0.5}cm`
+                folderSPAN.style.paddingLeft = `${recursiveDepthCalc(folderLI, 0) * 0.5}cm`
                 // Folder click event
                 folderSPAN.addEventListener('click', (event) => {
                     // Check if this folder is already loaded, if not, load it
@@ -74,18 +76,22 @@ function readDirectory(directory, node, openFolders = [], selectionIds = []) {
                         while(selections.length >= 1) {
                             selections[0].classList.toggle('selected');
                         }
+                        while(selectionList.length >= 1) {
+                            selectionList.pop();
+                        }
                     }
                     folderSPAN.classList.toggle('selected');
+                    selectionList.push(folderSPAN.id);
                 });
                 if(openFolders.includes(folderSPAN.id)) {
                     // Check if this folder is already loaded, if not, load it
                     if (!folderSPAN.parentElement.querySelector(".nested")) {
-                        readDirectory(path.join(directory, path.basename(folder)), folderLI, openFolders, selectionIds);
+                        readDirectory(path.join(directory, path.basename(folder)), folderLI, openFolders);
                     }
                     folderSPAN.parentElement.querySelector(".nested").classList.toggle("active");
                     folderSPAN.classList.toggle("folder-down");
                 };
-                if(selectionIds.includes(folderSPAN.id)) {
+                if(selectionList.includes(folderSPAN.id)) {
                     folderSPAN.classList.toggle('selected');
                 };
             });
@@ -101,18 +107,21 @@ function readDirectory(directory, node, openFolders = [], selectionIds = []) {
                 fileLI.appendChild(fileSPAN);
                 nestedUL.appendChild(fileLI);
                 // Calculates how depth the node is, in order to give him correct padding
-                depth = recursiveDepthCalc(fileLI, 0);
-                fileSPAN.style.paddingLeft = `${depth * 0.5}cm`;
+                fileSPAN.style.paddingLeft = `${recursiveDepthCalc(fileLI, 0) * 0.5}cm`;
                 fileSPAN.addEventListener('click', (event) => {
                     if(document.getElementsByClassName('selected')[0]  !== undefined && !event.ctrlKey) {
                         let selections = document.getElementsByClassName('selected')
                         while(selections.length >= 1) {
                             selections[0].classList.toggle('selected');
                         }
+                        while(selectionList.length >= 1) {
+                            selectionList.pop();
+                        }
                     }
                     fileSPAN.classList.toggle('selected');
+                    selectionList.push(fileSPAN.id);
                 });
-                if(selectionIds.includes(fileSPAN.id)) {
+                if(selectionList.includes(fileSPAN.id)) {
                     fileSPAN.classList.toggle('selected');
                 };
             });
@@ -145,10 +154,9 @@ function readUpperDirectory(upperDirectory, currentDirectory, fatherNode, folder
                     let subLi = fatherNode.getElementsByTagName('LI')
                     for (let i = 0; i < subLi.length ; i++) {
                         let el = subLi[i];
-                        let subDepth = recursiveDepthCalc(el, 0);
                         let elSpans =  el.getElementsByTagName('SPAN');
                         for (let z = 0; z < elSpans.length; z++) {
-                            elSpans[z].style.paddingLeft = `${subDepth * 0.5}cm`;
+                            elSpans[z].style.paddingLeft = `${recursiveDepthCalc(el, 0) * 0.5}cm`;
                         }
                     }
                     fatherNode.classList.toggle('active');
@@ -157,8 +165,7 @@ function readUpperDirectory(upperDirectory, currentDirectory, fatherNode, folder
                 else {
                     newFatherNode.appendChild(folderLI);
                 }
-                depth = recursiveDepthCalc(folderLI, 0);
-                folderSPAN.style.paddingLeft = `${depth * 0.5}cm`
+                folderSPAN.style.paddingLeft = `${recursiveDepthCalc(folderLI, 0) * 0.5}cm`
                 folderSPAN.addEventListener('click', (event) => {
                     // Check if this folder is already loaded, if not, load it
                     if(!event.ctrlKey) {
@@ -174,8 +181,12 @@ function readUpperDirectory(upperDirectory, currentDirectory, fatherNode, folder
                         while(selections.length >= 1) {
                             selections[0].classList.toggle('selected');
                         }
+                        while(selectionList.length >= 1) {
+                            selectionList.pop();
+                        }
                     }
                     folderSPAN.classList.toggle('selected');
+                    selectionList.push(folderSPAN.id);
                 });
             });
         }
@@ -188,16 +199,19 @@ function readUpperDirectory(upperDirectory, currentDirectory, fatherNode, folder
                 fileSPAN.innerText = path.basename(file);
                 fileLI.appendChild(fileSPAN);
                 newFatherNode.appendChild(fileLI);
-                depth = recursiveDepthCalc(fileLI, 0);
-                fileSPAN.style.paddingLeft = `${depth * 0.5}cm`;
+                fileSPAN.style.paddingLeft = `${recursiveDepthCalc(fileLI, 0) * 0.5}cm`;
                 fileSPAN.addEventListener('click', (event) => {
                     if(document.getElementsByClassName('selected')[0]  !== undefined && !event.ctrlKey) {
                         let selections = document.getElementsByClassName('selected')
                         while(selections.length >= 1) {
                             selections[0].classList.toggle('selected');
                         }
+                        while(selectionList.length >= 1) {
+                            selectionList.pop();
+                        }
                     }
                     fileSPAN.classList.toggle('selected');
+                    selectionList.push(fileSPAN.id);
                 });
             });
         }
@@ -215,13 +229,6 @@ function readUpperDirectory(upperDirectory, currentDirectory, fatherNode, folder
 }
 
 function refreshDirectory(directory, node) {
-    let selections = document.getElementsByClassName('selected')
-    let selectionIds = [];
-    if(selections[0] !== undefined) {
-        for(let i = 0; i < selections.length; i++) {
-            selectionIds.push(selections[i].id);
-        }
-    }
     let childs = node.getElementsByTagName('UL');
     let openFolders = [];
     for (let i = 0; i < childs.length; i++) {
@@ -234,7 +241,7 @@ function refreshDirectory(directory, node) {
             childs[i].parentElement.removeChild(childs[i])
         }
     }
-    let newUl = readDirectory(directory, node, openFolders, selectionIds);
+    let newUl = readDirectory(directory, node, openFolders);
     if(newUl.id === 'fatherNode') {
         while(node.firstChild) {
             node.removeChild(node.firstChild);
@@ -407,7 +414,7 @@ function newFolderButtonClickCallback(fatherNode) {
     }
 }
 
-function deleteButtonClickCallback(fatherNode) {
+function deleteCallback(fatherNode) {
     if(document.getElementsByClassName('selected')[0]  !== undefined) {
         let el = document.getElementsByClassName('selected');
         for(let i = 0; i < el.length; i++) {
@@ -420,4 +427,36 @@ function deleteButtonClickCallback(fatherNode) {
     }
 }
 
-module.exports = {readDirectory, readUpperDirectory, refreshDirectory, newFileButtonClickCallback, newFolderButtonClickCallback, deleteButtonClickCallback};
+function collapseButtonClickCallback() {
+    let activeSpans = document.getElementsByClassName('folder-down');
+    while(activeSpans.length >= 1) {
+        activeSpans[0].classList.remove('folder-down');
+    }
+    let openNests = document.getElementsByClassName('nested active');
+    while(openNests.length >= 1) {
+        openNests[0].classList.remove('active');
+    }
+}
+
+function focusOutListener() {
+    window.addEventListener('click', (event) => {
+        if(!document.getElementById('sidebar').contains(event.target)) {
+            let selections = document.getElementsByClassName('selected');
+            while(selections.length >= 1) {
+                selections[0].classList.toggle('selected');
+            }
+            while(selectionList.length >= 1) {
+                selectionList.pop();
+            }
+        }
+    });
+}
+
+module.exports = {readDirectory
+                 ,readUpperDirectory
+                 ,refreshDirectory
+                 ,newFileButtonClickCallback
+                 ,newFolderButtonClickCallback
+                 ,deleteCallback
+                 ,collapseButtonClickCallback
+                 ,focusOutListener};
