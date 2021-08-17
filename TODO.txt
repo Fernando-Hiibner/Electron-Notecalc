@@ -1,24 +1,16 @@
 // Fazendo
-
-TODO Renomear pasta
-TODO Deletar coisas
-OBS: Esses dois é por seleção e atalho no teclado
-// Todo / Fixme | Prioridade -> 1
-
-// Todo / Fixme | Prioridade -> 2
-TODO Implementar o sliceMainFolderName para todas as pastas e arquivos
-     OBS Dificuldade disso é no renderer, como fazer isso iterar direito, talvez API de contextBridge
-
-TODO Implementar um recursiveDepthCalc para calcular a margem do nameInput
-     OBS Da forma que ta agora ele fica no depth to pai, mas como o arquivo / pasta criado por ele será filho, ele deve ter depth de filho
+TODO Selecioar o arquivo/Pasta que foi criada / renomeada
 
 TODO Menu de contexto na sidebar
      OBS Muito importante, está em prioridade 2 apenas porque os de prioridade 1 são bugs e implementações necessárias pra ser a base desse e outros
-
-// Todo / Fixme | Prioridade -> 3
+// Todo / Fixme | Prioridade -> 1
 TODO Navegação pela sidebar com as setas do teclado, enter para simular o clique, delete para deletar e f2 para renomear
      OBS Obviamente compativel com o Control e o Shift, feito pra ser uma outra forma de navegar pela sidebar
-
+// Todo / Fixme | Prioridade -> 2
+TODO Implementar o sliceMainFolderName para todas as pastas e arquivos
+     OBS Dificuldade disso é no renderer, como fazer isso iterar direito, talvez API de contextBridge
+// Todo / Fixme | Prioridade -> 3
+VAZIO
 // Todo / Fixme | Prioridade -> 90
 TODO Por o Spotify, WhatsApp, Telegram, Discord e etc numa barra lateral (Tipo o Opera)
 
@@ -41,3 +33,8 @@ DONE Multipla seleção:
           OBS: depois no segundo usa, "while(el.nextSinbling != "el selecionado)" e da toggle no select do el, e atribui next sinbling pra ele
 FIXED Criar uma lista de selecionados ou algo do genero, pra saber exatamente quem foi o ultimo selecionado, da forma que ta agora ele pega por ordem de node
 DONE testar a seleção com Shift e implementar a criação de arquivos e pastas usando o ultimo arquivo selecionado como pai
+DONE Implementar um recursiveDepthCalc para calcular a margem do nameInput (Foi bem mais easy que isso)
+     OBS Da forma que ta agora ele fica no depth to pai, mas como o arquivo / pasta criado por ele erá filho, ele deve ter depth de filho
+DONE Renomear pasta
+DONE Deletar coisas
+OBS: Esses dois é por seleção e atalho no teclado

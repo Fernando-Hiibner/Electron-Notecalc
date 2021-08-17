@@ -1,7 +1,7 @@
 const {toolbarOptions, showColorPicker} = require('quill-increment');
 const {contextBridge} = require('electron');
 const highlight = require('highlight.js');
-const {Sidebar} = require('sidebar');
+const Sidebar = require('sidebar');
 const Quill = require('quill');
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -28,11 +28,12 @@ window.addEventListener('DOMContentLoaded', () => {
     toolbar.addHandler('background', (value) => {showColorPicker(value, editor)});
 
     let sidebar = new Sidebar(document.getElementsByClassName('parent-container')[0], true);
-
     contextBridge.exposeInMainWorld('bridge', {
         sliceMainFolderName: (sliceIndex, currentFolderName) => {
             Sidebar.sliceMainFolderName(sliceIndex, currentFolderName);
         },
+    });
+    contextBridge.exposeInMainWorld('debug', {
         debugSelectionList: () => {
             console.log("Whole list: ", sidebar.selectionList);
             console.log("First element: ", sidebar.selectionList[0]);

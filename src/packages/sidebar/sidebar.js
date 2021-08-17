@@ -2,11 +2,12 @@ const path = require('path');
 const fs = require('fs');
 
 class Sidebar {
-    constructor(parentNode, paned = false) {
+    constructor(parentNode, paned = false, hotkeys = true) {
         // Creating the sidebar div in the DOM
         this.sidebar = document.createElement('div');
         this.sidebar.setAttribute('class', 'sidebar');
         this.sidebar.setAttribute('id', 'sidebar');
+        this.sidebar.setAttribute('tabindex', '-1');
         parentNode.insertBefore(this.sidebar, parentNode.firstChild);
 
         // Creating the father node
@@ -93,7 +94,7 @@ class Sidebar {
                     selections[0].classList.toggle('selected');
                 }
                 while(this.selectionList.length > 0) {
-                    this.selectionList.pop();
+                    document.getElementById(this.selectionList.pop()).classList.remove('selected');
                 }
             }
         });
@@ -110,6 +111,32 @@ class Sidebar {
             this.panedJSScript.setAttribute('type', "text/javascript");
 
             document.getElementsByTagName('BODY')[0].appendChild(this.panedJSScript);
+        }
+
+        if(hotkeys) {
+            this.hotkeysJSScript = document.createElement('script');
+            this.hotkeysJSScript.setAttribute('src', path.join(__dirname, "src/script/hotkeys.js"));
+            this.hotkeysJSScript.setAttribute('type', "text/javascript");
+
+            document.getElementsByTagName('BODY')[0].appendChild(this.hotkeysJSScript);
+
+            this.sidebar.addEventListener('keyup', (event) => {
+                if(event.key === 'F2') {
+                    this.renameCallback();
+                }
+                else if(event.key === 'Delete') {
+                    this.deleteCallback();
+                }
+                else if(event.key === 'F5') {
+                    this.refreshDirectory(process.cwd(), this.fatherNode);
+                }
+                else if(event.ctrlKey && event.key === 'n') {
+                    this.newFileButtonClickCallback();
+                }
+                else if(event.ctrlKey && event.shiftKey && event.key === "O") {
+                    this.newFolderButtonClickCallback();
+                }
+            });
         }
     }
     recursiveAsyncReadDir(directory, done) {
@@ -160,7 +187,7 @@ class Sidebar {
                 selections[0].classList.toggle('selected');
             }
             while(this.selectionList.length > 0) {
-                this.selectionList.pop();
+                document.getElementById(this.selectionList.pop()).classList.remove('selected');
             }
         }
     }
@@ -373,7 +400,8 @@ class Sidebar {
         }
         // Cleans the selection, because i tought it would be convenient
         while(this.selectionList.length > 0) {
-            this.selectionList.pop();
+            //FIXME Não faço ideia do pq esse erro ocorre aqui, um dia eu voltarei pra resolver, quando a luz da sabedoria tocar meu ser
+            try {document.getElementById(this.selectionList.pop()).classList.remove('selected');} catch(err) {console.log("Volte por mim(っ °Д °;)っ");}
         }
         let newUl = this.readDirectory(directory, node, openFolders);
         if(newUl.id === 'fatherNode') {
@@ -427,6 +455,51 @@ class Sidebar {
         })
     }
 
+    renameInputFunc(node, margin) {
+        let renameInput = document.createElement('input');
+        renameInput.setAttribute('type', 'text');
+        renameInput.value = node.innerText;
+        renameInput.setSelectionRange(0, node.innerText.indexOf('.'));
+        node.parentElement.insertBefore(renameInput, node);
+        node.style.display = 'none';
+        renameInput.style.width = `calc(100% - ${margin})`;
+        renameInput.style.marginLeft = margin;
+        let offsetTop = this.getElOffset(renameInput).top;
+        renameInput.focus({
+            preventScroll: true
+        });
+        this.sidebar.scrollTo(0, offsetTop);
+        renameInput.addEventListener('focusout', () => {
+            try {renameInput.remove()} catch(err) {console.log(err)};
+            node.style.display = 'inline-block'
+        });
+        renameInput.addEventListener('keydown', (event) => {
+            if(event.key === 'Enter') {
+                if(renameInput.value === "") {
+                    alert("Insira um nome!");
+                    return;
+                }
+                let newName = path.join(path.resolve(node.id, ".."), renameInput.value);
+                fs.rename(node.id, newName, (err) => {
+                    if(err) {
+                        try {renameInput.remove()} catch(err) {console.log(err)};
+                    }
+                    else {
+                        try {renameInput.remove()} catch(err) {console.log(err)};
+                        this.selectionList[this.selectionList.length - 1] = newName;
+                        node.setAttribute('id', newName);
+                        this.refreshDirectory(process.cwd(), this.fatherNode);
+                    }
+                });
+            }
+            else if(event.key === 'Escape') {
+                try {renameInput.remove()} catch(err) {console.log(err)};
+                node.style.display = 'inline-block'
+                return;
+            }
+        })
+    }
+
     newFileButtonClickCallback() {
         if(document.getElementsByClassName('selected')[0]  !== undefined) {
             //TRY tentativa de considerar só o ultimo da seleção
@@ -434,10 +507,9 @@ class Sidebar {
             fs.lstat(el.id, (err, stat) => {
                 if(err) throw err;
                 if(stat && stat.isDirectory()) {
-                    this.nameInputFunc(el.parentElement, el.style.paddingLeft, (nameInput) => {
+                    this.nameInputFunc(el.parentElement, `calc(${el.style.paddingLeft} + 0.5cm)`, (nameInput) => {
                         fs.writeFile(path.join(el.id, nameInput.value), "", (err) => {
                             if(err) {
-                                alert(err);
                                 try {nameInput.remove()} catch(err) {console.log(err)};
                             }
                             else {
@@ -486,7 +558,7 @@ class Sidebar {
             })
         }
         while(this.selectionList.length > 0) {
-            this.selectionList.pop();
+            document.getElementById(this.selectionList.pop()).classList.remove('selected');
         }
     }
     
@@ -497,7 +569,7 @@ class Sidebar {
             fs.lstat(el.id, (err, stat) => {
                 if(err) throw err;
                 if(stat && stat.isDirectory()) {
-                    this.nameInputFunc(el.parentElement, el.style.paddingLeft, (nameInput) => {
+                    this.nameInputFunc(el.parentElement, `calc(${el.style.paddingLeft} + 0.5cm)`, (nameInput) => {
                         fs.mkdir(path.join(el.id, nameInput.value), (err) => {
                             if(err) {
                                 alert(err);
@@ -549,7 +621,7 @@ class Sidebar {
             })
         }
         while(this.selectionList.length > 0) {
-            this.selectionList.pop();
+            document.getElementById(this.selectionList.pop()).classList.remove('selected');
         }
     }
 
@@ -563,6 +635,12 @@ class Sidebar {
         }
     }
 
+    renameCallback() {
+        if(this.selectionList[0] === undefined) return;
+        let el = document.getElementById(this.selectionList[this.selectionList.length - 1]);
+        this.renameInputFunc(el, el.style.paddingLeft);
+    }
+
     collapseButtonClickCallback() {
         let activeSpans = document.getElementsByClassName('folder-down');
         while(activeSpans.length > 0) {
@@ -573,7 +651,7 @@ class Sidebar {
             openNests[0].classList.remove('active');
         }
         while(this.selectionList.length > 0) {
-            this.selectionList.pop();
+            document.getElementById(this.selectionList.pop()).classList.remove('selected');
         }
     }
 
@@ -594,4 +672,4 @@ class Sidebar {
 
 
 
-module.exports = {Sidebar};
+module.exports = Sidebar;

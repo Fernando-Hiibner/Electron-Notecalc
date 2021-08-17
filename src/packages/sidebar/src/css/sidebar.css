@@ -12,6 +12,10 @@
     font-family: 'Consolas';
 }
 
+.sidebar:focus {
+    outline: none;
+}
+
 #sidebarHeaderDiv {
     background-color: white;
     position: sticky;
