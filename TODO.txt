@@ -1,6 +1,4 @@
 // Fazendo
-TODO testar a seleção com Shift e implementar a criação de arquivos e pastas usando o ultimo arquivo selecionado como pai
-
 
 TODO Renomear pasta
 TODO Deletar coisas
@@ -41,4 +39,5 @@ DONE Multipla seleção:
      DONE Seleção com Shift
           OBS: Esse é simples, quando aperta o primeiro shift seleciona, 
           OBS: depois no segundo usa, "while(el.nextSinbling != "el selecionado)" e da toggle no select do el, e atribui next sinbling pra ele
-     FIXED Criar uma lista de selecionados ou algo do genero, pra saber exatamente quem foi o ultimo selecionado, da forma que ta agora ele pega por ordem de node
+FIXED Criar uma lista de selecionados ou algo do genero, pra saber exatamente quem foi o ultimo selecionado, da forma que ta agora ele pega por ordem de node
+DONE testar a seleção com Shift e implementar a criação de arquivos e pastas usando o ultimo arquivo selecionado como pai

@@ -27,11 +27,16 @@ window.addEventListener('DOMContentLoaded', () => {
     toolbar.addHandler('color', (value) => {showColorPicker(value, editor)});
     toolbar.addHandler('background', (value) => {showColorPicker(value, editor)});
 
-    new Sidebar(document.getElementsByClassName('parent-container')[0], true);
+    let sidebar = new Sidebar(document.getElementsByClassName('parent-container')[0], true);
 
     contextBridge.exposeInMainWorld('bridge', {
         sliceMainFolderName: (sliceIndex, currentFolderName) => {
             Sidebar.sliceMainFolderName(sliceIndex, currentFolderName);
+        },
+        debugSelectionList: () => {
+            console.log("Whole list: ", sidebar.selectionList);
+            console.log("First element: ", sidebar.selectionList[0]);
+            console.log("Last element: ", sidebar.selectionList[sidebar.selectionList.length - 1]);
         }
     });
 });

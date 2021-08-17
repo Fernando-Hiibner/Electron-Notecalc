@@ -89,10 +89,10 @@ class Sidebar {
         window.addEventListener('click', (event) => {
             if(!document.getElementById('sidebar').contains(event.target)) {
                 let selections = document.getElementsByClassName('selected');
-                while(selections.length >= 1) {
+                while(selections.length > 0) {
                     selections[0].classList.toggle('selected');
                 }
-                while(this.selectionList.length >= 1) {
+                while(this.selectionList.length > 0) {
                     this.selectionList.pop();
                 }
             }
@@ -156,10 +156,10 @@ class Sidebar {
     ctrlSelection(event) {
         if(document.getElementsByClassName('selected')[0] !== undefined && !event.ctrlKey && !event.shiftKey) {
             let selections = document.getElementsByClassName('selected')
-            while(selections.length >= 1) {
+            while(selections.length > 0) {
                 selections[0].classList.toggle('selected');
             }
-            while(this.selectionList.length >= 1) {
+            while(this.selectionList.length > 0) {
                 this.selectionList.pop();
             }
         }
@@ -371,6 +371,10 @@ class Sidebar {
                 childs[i].parentElement.removeChild(childs[i]);
             }
         }
+        // Cleans the selection, because i tought it would be convenient
+        while(this.selectionList.length > 0) {
+            this.selectionList.pop();
+        }
         let newUl = this.readDirectory(directory, node, openFolders);
         if(newUl.id === 'fatherNode') {
             while(node.firstChild) {
@@ -426,7 +430,7 @@ class Sidebar {
     newFileButtonClickCallback() {
         if(document.getElementsByClassName('selected')[0]  !== undefined) {
             //TRY tentativa de considerar só o ultimo da seleção
-            let el = this.selectionList[this.selectionList.length - 1];
+            let el = document.getElementById(this.selectionList[this.selectionList.length - 1]);
             fs.lstat(el.id, (err, stat) => {
                 if(err) throw err;
                 if(stat && stat.isDirectory()) {
@@ -481,12 +485,15 @@ class Sidebar {
                 })
             })
         }
+        while(this.selectionList.length > 0) {
+            this.selectionList.pop();
+        }
     }
     
     newFolderButtonClickCallback() {
-        if(document.getElementsByClassName('selected')[0]  !== undefined) {
+        if(this.selectionList[0]  !== undefined) {
             //TRY tentativa de considerar só o ultimo da seleção
-            let el = this.selectionList[this.selectionList.length - 1];
+            let el = document.getElementById(this.selectionList[this.selectionList.length - 1]);
             fs.lstat(el.id, (err, stat) => {
                 if(err) throw err;
                 if(stat && stat.isDirectory()) {
@@ -541,13 +548,15 @@ class Sidebar {
                 });
             })
         }
+        while(this.selectionList.length > 0) {
+            this.selectionList.pop();
+        }
     }
 
     deleteCallback() {
-        if(document.getElementsByClassName('selected')[0]  !== undefined) {
-            let el = document.getElementsByClassName('selected');
-            for(let i = 0; i < el.length; i++) {
-                fs.rm(el[i].id, {recursive: true, force: true}, () => {
+        if(this.selectionList[0]  !== undefined) {
+            while(this.selectionList.length > 0) {
+                fs.rm(this.selectionList.pop(), {recursive: true, force: true}, () => {
                     this.refreshDirectory(process.cwd(), this.fatherNode); //FIXME ta zuado, não ta mais dando refresh direito, e é só aqui
                 });
             }
@@ -556,12 +565,15 @@ class Sidebar {
 
     collapseButtonClickCallback() {
         let activeSpans = document.getElementsByClassName('folder-down');
-        while(activeSpans.length >= 1) {
+        while(activeSpans.length > 0) {
             activeSpans[0].classList.remove('folder-down');
         }
         let openNests = document.getElementsByClassName('nested active');
-        while(openNests.length >= 1) {
+        while(openNests.length > 0) {
             openNests[0].classList.remove('active');
+        }
+        while(this.selectionList.length > 0) {
+            this.selectionList.pop();
         }
     }
 
