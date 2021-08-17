@@ -1,0 +1,123 @@
+@font-face {
+    font-family: Droid Sans Mono;
+    src: url('../fonts/Droid Sans Mono Nerd Font Complete.otf');
+}
+
+.sidebar {
+    font-size: 14px;
+    overflow-y: auto;
+    user-select: none;
+    overflow-x: hidden;
+    white-space: nowrap;
+    font-family: 'Consolas';
+}
+
+.sidebar:focus {
+    outline: none;
+}
+
+#sidebarHeaderDiv {
+    background-color: white;
+    position: sticky;
+    display: flex;
+    top: 0;
+}
+
+.sidebarHeaderButtons {
+    border: 0;
+    float: right;
+    cursor: pointer;
+    background-color: white;
+    z-index: 10;
+}
+
+.sidebarHeaderButtons:hover {
+    border-radius: 5px;
+    background-color: #cccccc;
+}
+
+#upperFolderButton::before {
+    content: '\f0d8';
+    font-family: 'Droid Sans Mono';
+}
+
+#sidebarHeaderButtonsDiv {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}
+
+#newFileButton ,#newFolderButton, #refreshButton, #collapseButton {
+    margin-right: 2px;
+}
+
+#newFileButton::before {
+    content: '\fc50';
+    font-family: 'Droid Sans Mono';
+}
+
+#newFolderButton::before {
+    content: '\f756';
+    font-family: 'Droid Sans Mono';
+}
+
+#refreshButton::before {
+    content: '\f94f';
+    font-family: 'Droid Sans Mono';
+}
+
+#collapseButton::before {
+    content: '\f146';
+    font-family: 'Droid Sans Mono';
+}
+
+ul {
+    padding: 0;
+    list-style-type: none;
+}
+
+.sidebar span {
+    width: 100%;
+    display: inline-block;
+}
+
+.sidebar span:hover {
+    cursor: pointer;
+    background-color: #cccccc;
+}
+
+#fatherNode {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
+.folder {
+    cursor: pointer;
+    user-select: none;
+}
+
+.folder::before {
+    color: black;
+    content: "\f07b";
+    margin-right: 6px;
+    display: inline-block;
+    font-family: 'Droid Sans Mono';
+}
+
+.folder-down::before {
+    content: "\f07c";
+    font-family: 'Droid Sans Mono';
+}
+
+.nested {
+    display: none;
+}
+
+.active {
+    display: block;
+}
+
+.selected {
+    background-color: #cccccc;
+}

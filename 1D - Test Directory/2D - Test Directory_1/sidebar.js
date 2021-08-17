@@ -456,6 +456,7 @@ class Sidebar {
     }
 
     renameInputFunc(node, margin) {
+        console.log(node);
         let renameInput = document.createElement('input');
         renameInput.setAttribute('type', 'text');
         renameInput.value = node.innerText;
@@ -561,7 +562,7 @@ class Sidebar {
             document.getElementById(this.selectionList.pop()).classList.remove('selected');
         }
     }
-
+    
     newFolderButtonClickCallback() {
         if(this.selectionList[0]  !== undefined) {
             //TRY tentativa de considerar só o ultimo da seleção
@@ -662,7 +663,6 @@ class Sidebar {
             if(sliceIndex < 8) {
                 sliceIndex = 8;
             }
-            if(path.basename(process.cwd())[sliceIndex-1] === ' ') sliceIndex -= 1;
             currentFolderName.innerText = path.basename(process.cwd()).toUpperCase().slice(0, sliceIndex) + "...";
         }
     }

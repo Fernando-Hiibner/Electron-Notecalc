@@ -1,4 +1,6 @@
 // Fazendo
+FIXME Esse bangue de não reconhecer nada recem criado ou nomeado
+
 TODO Selecioar o arquivo/Pasta que foi criada / renomeada
 
 TODO Menu de contexto na sidebar

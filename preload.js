@@ -4,6 +4,8 @@ const highlight = require('highlight.js');
 const Sidebar = require('sidebar');
 const Quill = require('quill');
 
+const path = require('path');
+
 window.addEventListener('DOMContentLoaded', () => {
     // Change cwd to test folder
     // process.chdir('C:\\Users\\fernandoaffonso\\Desktop\\Pessoal\\Estudos\\Javascript\\Electron 2 Test Folder');
@@ -26,6 +28,8 @@ window.addEventListener('DOMContentLoaded', () => {
     let toolbar = editor.getModule('toolbar');
     toolbar.addHandler('color', (value) => {showColorPicker(value, editor)});
     toolbar.addHandler('background', (value) => {showColorPicker(value, editor)});
+
+    process.chdir(path.join(__dirname, "1D - Test Directory"));
 
     let sidebar = new Sidebar(document.getElementsByClassName('parent-container')[0], true);
     contextBridge.exposeInMainWorld('bridge', {
