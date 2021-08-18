@@ -127,7 +127,7 @@ class Sidebar extends SidebarCore {
         this.sidebarHeaderDiv.appendChild(this.upperFolderButton);
         this.sidebarHeaderDiv.appendChild(this.currentFolderName);
         this.sidebarHeaderDiv.appendChild(this.sidebarHeaderButtonsDiv);
-        Sidebar.sliceMainFolderName(10, this.currentFolderName);
+        this.sliceMainFolderName(10, this.currentFolderName);
 
         this.sidebar.appendChild(this.sidebarHeaderDiv);
         this.sidebar.appendChild(this.fatherNode);
@@ -415,12 +415,16 @@ class Sidebar extends SidebarCore {
             this.currentFolderName.innerText = path.basename(process.cwd()).toUpperCase();
         }
         else {
-            // TODO Mandar essa formula pro context bridge e adaptar isso no renderer tambem
-            this.currentFolderName.innerText = path.basename(process.cwd()).toUpperCase().slice(0, Math.floor((sidebar.getBoundingClientRect().width-40)/14)-3) + "...";
+            this.currentFolderName.innerText = path.basename(process.cwd()).toUpperCase().slice(0, this.sliceIndexFunc(sidebar.getBoundingClientRect().width)) + "...";
         }
     }
 
     refreshDirectory(directory, node) {
+        // Cleans the selection, because i tought it would be convenient
+        while(this.selectionList.length > 0) {
+            try {document.getElementById(this.selectionList.pop()).classList.remove('selected');} catch(err) {alert(err);}
+        }
+
         let childs = node.getElementsByTagName('UL');
         let openFolders = [];
         for (let i = 0; i < childs.length; i++) {
@@ -432,11 +436,6 @@ class Sidebar extends SidebarCore {
             if (childs[i].tagName === 'UL') {
                 childs[i].parentElement.removeChild(childs[i]);
             }
-        }
-        // Cleans the selection, because i tought it would be convenient
-        while(this.selectionList.length > 0) {
-            //FIXME Não faço ideia do pq esse erro ocorre aqui, um dia eu voltarei pra resolver, quando a luz da sabedoria tocar meu ser
-            try {document.getElementById(this.selectionList.pop()).classList.remove('selected');} catch(err) {alert(err);}
         }
         let newUl = this.readDirectory(directory, node, openFolders);
         if(newUl.id === 'fatherNode') {
@@ -513,8 +512,8 @@ class Sidebar extends SidebarCore {
                     }
                     else {
                         try {renameInput.remove()} catch(err) {console.log(err)};
-                        // this.selectionList[this.selectionList.length - 1] = newName;
-                        // node.setAttribute('id', newName);
+                        this.selectionList[this.selectionList.length - 1] = newName;
+                        node.setAttribute('id', newName);
                         this.refreshDirectory(process.cwd(), this.fatherNode);
                     }
                 });
@@ -529,7 +528,6 @@ class Sidebar extends SidebarCore {
 
     newFileButtonClickCallback() {
         if(document.getElementsByClassName('selected')[0]  !== undefined) {
-            //TRY tentativa de considerar só o ultimo da seleção
             let el = document.getElementById(this.selectionList[this.selectionList.length - 1]);
             fs.lstat(el.id, (err, stat) => {
                 if(err) throw err;
@@ -591,7 +589,6 @@ class Sidebar extends SidebarCore {
 
     newFolderButtonClickCallback() {
         if(this.selectionList[0]  !== undefined) {
-            //TRY tentativa de considerar só o ultimo da seleção
             let el = document.getElementById(this.selectionList[this.selectionList.length - 1]);
             fs.lstat(el.id, (err, stat) => {
                 if(err) throw err;
@@ -681,7 +678,12 @@ class Sidebar extends SidebarCore {
         }
     }
 
-    static sliceMainFolderName(sliceIndex, currentFolderName) {
+    //TODO Mandar essa formula pro context bridge e adaptar isso no renderer tambem (formula do sliceMainFolderName)
+    sliceIndexFunc(px) {
+        return Math.floor((px-40)/14)-3;
+    }
+
+    sliceMainFolderName(sliceIndex, currentFolderName) {
         if(path.basename(process.cwd()).length <= 10 || path.basename(process.cwd()).length <= sliceIndex) {
             currentFolderName.innerText = path.basename(process.cwd()).toUpperCase();
         }

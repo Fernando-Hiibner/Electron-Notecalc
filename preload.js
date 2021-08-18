@@ -34,8 +34,11 @@ window.addEventListener('DOMContentLoaded', () => {
     let sidebar = new Sidebar(document.getElementsByClassName('parent-container')[0], true);
     contextBridge.exposeInMainWorld('bridge', {
         sliceMainFolderName: (sliceIndex, currentFolderName) => {
-            Sidebar.sliceMainFolderName(sliceIndex, currentFolderName);
+            sidebar.sliceMainFolderName(sliceIndex, currentFolderName);
         },
+        sliceIndexFunc: (px) => {
+            sidebar.sliceIndexFunc(px);
+        }
     });
     contextBridge.exposeInMainWorld('debug', {
         debugSelectionList: () => {

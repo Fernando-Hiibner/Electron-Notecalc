@@ -1,6 +1,4 @@
 // Fazendo
-FIXME Esse bangue de não reconhecer nada recem criado ou nomeado
-
 TODO Selecioar o arquivo/Pasta que foi criada / renomeada
 
 TODO Menu de contexto na sidebar
@@ -40,3 +38,5 @@ DONE Implementar um recursiveDepthCalc para calcular a margem do nameInput (Foi 
 DONE Renomear pasta
 DONE Deletar coisas
 OBS: Esses dois é por seleção e atalho no teclado
+//FIXED Arrumando o BO do refreshDirectory e as seleções, o BO é que ele tava depois da remoção das childs do Node (pq o refresh directory remove só os nodes filhos do node enviado por questões de performance)
+//DONE tentativa de considerar só o ultimo da seleção (feito)
