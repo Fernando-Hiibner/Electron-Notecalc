@@ -1,0 +1,108 @@
+@font-face {
+    font-family: Droid Sans Mono;
+    src: url('../fonts/Droid Sans Mono Nerd Font Complete.otf');
+}
+
+.file::before {
+    color: #0691dc;
+    content: "\f15b";
+    margin-right: 6px;
+    display: inline-block;
+    font-family: 'Droid Sans Mono';
+}
+
+.txt::before {
+    color: #0691dc;
+    content: "\f15c";
+    margin-right: 6px;
+    display: inline-block;
+    font-family: 'Droid Sans Mono';
+}
+
+.cpp::before {
+    color: #065cdc;
+    content: "\e61d";
+    margin-right: 6px;
+    display: inline-block;
+    font-family: 'Droid Sans Mono';
+}
+
+.css::before {
+    color: #0691dc;
+    content: "\e749";
+    margin-right: 6px;
+    display: inline-block;
+    font-family: 'Droid Sans Mono';
+}
+
+.js::before {
+    color: #d3bc0b;
+    content: "\e781";
+    margin-right: 6px;
+    display: inline-block;
+    font-family: 'Droid Sans Mono';
+}
+
+.html::before {
+    color: #991713;
+    content: "\e736";
+    margin-right: 6px;
+    display: inline-block;
+    font-family: 'Droid Sans Mono';
+}
+
+.ini::before {
+    color: #0691dc;
+    content: "\e615";
+    margin-right: 6px;
+    display: inline-block;
+    font-family: 'Droid Sans Mono';
+}
+
+.xml::before {
+    color: #709b0b;
+    content: "\f72d";
+    margin-right: 6px;
+    display: inline-block;
+    font-family: 'Droid Sans Mono';
+}
+
+.bin::before {
+    color: #0c9439;
+    content: "\f471";
+    margin-right: 6px;
+    display: inline-block;
+    font-family: 'Droid Sans Mono';
+}
+
+.json::before {
+    color: #ed992b;
+    content: "\fb25";
+    margin-right: 6px;
+    display: inline-block;
+    font-family: 'Droid Sans Mono';
+}
+
+.png::before, .jpg::before {
+    color: #0c9439;
+    content: "\f71e";
+    margin-right: 6px;
+    display: inline-block;
+    font-family: 'Droid Sans Mono';
+}
+
+.pdf::before {
+    color: #991713;
+    content: "\f724";
+    margin-right: 6px;
+    display: inline-block;
+    font-family: 'Droid Sans Mono';
+}
+
+.py::before {
+    color: #065cdc;
+    content: "\e73c";
+    margin-right: 6px;
+    display: inline-block;
+    font-family: 'Droid Sans Mono';
+}

@@ -4,17 +4,6 @@
     display: flex;
 }
 
-.sidebar {
-    width: 200px;
-}
-.resize-handle {
-    width: 1px;
-    height: 100%;
-    display: flex;
-    cursor: ew-resize;
-    background-color: #cbd5e0;
-}
-
 .main {
     flex: 1;
 }

@@ -1,8 +1,59 @@
 const path = require('path');
 const fs = require('fs');
 
-class Sidebar {
+class SidebarCore {
+    recursiveAsyncReadDir(directory, done) {
+        let folders = [];
+        let files = [];
+        fs.readdir(directory, function (err, list) {
+            if (err) return done(err);
+            let i = 0;
+            (function next() {
+                let file = list[i++];
+                if (!file) return done(null, folders, files);
+                file = path.resolve(directory, file);
+                fs.stat(file, function (err, stat) {
+                    if (stat && stat.isDirectory()) folders.push(file);
+                    else files.push(file);
+                    next();
+                });
+            })();
+        });
+    }
+
+    recursiveDepthCalc(el, sum) {
+        if (el.parentElement.id === 'fatherNode') {
+            return sum+1;
+        }
+        else if (el.tagName !== 'UL') {
+            return this.recursiveDepthCalc(el.parentElement, sum);
+        }
+        else {
+            return this.recursiveDepthCalc(el.parentElement, sum + 1);
+        }
+    }
+
+    getElOffset(el) {
+        const rect = el.getBoundingClientRect();
+        return {
+            left: rect.left + window.scrollX,
+            top: rect.top + window.scrollY
+        };
+    }
+
+    getExtension(path) {
+        let basename = path.split(/[\\/]/).pop()
+           ,pos = basename.lastIndexOf(".");
+
+        if (basename === "" || pos < 1) return "";
+
+        return basename.slice(pos + 1);
+    }
+}
+class Sidebar extends SidebarCore {
     constructor(parentNode, paned = false, hotkeys = true) {
+        //Instantiate the super class
+        super();
         // Creating the sidebar div in the DOM
         this.sidebar = document.createElement('div');
         this.sidebar.setAttribute('class', 'sidebar');
@@ -103,6 +154,16 @@ class Sidebar {
             }
         });
 
+        this.mainCSSLink = document.createElement('link');
+        this.mainCSSLink.setAttribute('href', path.join(__dirname, 'src/css/sidebar.css'));
+        this.mainCSSLink.setAttribute('rel', 'stylesheet');
+
+        this.iconCSSLink = document.createElement('link');
+        this.iconCSSLink.setAttribute('href', path.join(__dirname, 'src/css/fileIcons.css'));
+        this.iconCSSLink.setAttribute('rel', 'stylesheet');
+
+        document.getElementsByTagName('HEAD')[0].appendChild(this.mainCSSLink);
+        document.getElementsByTagName('HEAD')[0].appendChild(this.iconCSSLink);
         if(paned) {
             this.panedHandle = document.createElement('div');
             this.panedHandle.setAttribute('class', 'resize-handle');
@@ -141,36 +202,6 @@ class Sidebar {
                     this.newFolderButtonClickCallback();
                 }
             });
-        }
-    }
-    recursiveAsyncReadDir(directory, done) {
-        let folders = [];
-        let files = [];
-        fs.readdir(directory, function (err, list) {
-            if (err) return done(err);
-            let i = 0;
-            (function next() {
-                let file = list[i++];
-                if (!file) return done(null, folders, files);
-                file = path.resolve(directory, file);
-                fs.stat(file, function (err, stat) {
-                    if (stat && stat.isDirectory()) folders.push(file);
-                    else files.push(file);
-                    next();
-                });
-            })();
-        });
-    }
-
-    recursiveDepthCalc(el, sum) {
-        if (el.parentElement.id === 'fatherNode') {
-            return sum+1;
-        }
-        else if (el.tagName !== 'UL') {
-            return this.recursiveDepthCalc(el.parentElement, sum);
-        }
-        else {
-            return this.recursiveDepthCalc(el.parentElement, sum + 1);
         }
     }
 
@@ -240,13 +271,13 @@ class Sidebar {
         // Async read the directory and create the folders and files in the sidebar
         this.recursiveAsyncReadDir(directory, (err, folders, files) => {
             if (folders) {
-                folders.forEach((folder) => {
+                folders.forEach((folderPath) => {
                     // Create the folders
                     let folderLI = document.createElement('li');
                     let folderSPAN = document.createElement('span');
                     folderSPAN.setAttribute('class', 'folder');
-                    folderSPAN.id = String(folder)
-                    folderSPAN.innerText = path.basename(folder);
+                    folderSPAN.id = String(folderPath)
+                    folderSPAN.innerText = path.basename(folderPath);
                     folderLI.appendChild(folderSPAN);
                     nestedUL.appendChild(folderLI);
                     // Calculates how depth the node is, in order to give him correct padding
@@ -254,7 +285,7 @@ class Sidebar {
                     // Folder click event
                     folderSPAN.addEventListener('click', (event) => {
                         // Check if this folder is already loaded, if not, load it
-                        this.openFolderCallback(event, directory, folder, folderLI, folderSPAN);
+                        this.openFolderCallback(event, directory, folderPath, folderLI, folderSPAN);
                         this.ctrlSelection(event);
                         this.shiftSelection(event, folderSPAN);
 
@@ -264,7 +295,7 @@ class Sidebar {
                     if(openFolders.includes(folderSPAN.id)) {
                         // Check if this folder is already loaded, if not, load it
                         if (!folderSPAN.parentElement.querySelector(".nested")) {
-                            this.readDirectory(path.join(directory, path.basename(folder)), folderLI, openFolders);
+                            this.readDirectory(path.join(directory, path.basename(folderPath)), folderLI, openFolders);
                         }
                         folderSPAN.parentElement.querySelector(".nested").classList.toggle("active");
                         folderSPAN.classList.toggle("folder-down");
@@ -274,13 +305,15 @@ class Sidebar {
                 });
             }
             if (files) {
-                files.forEach((file) => {
+                files.forEach((filePath) => {
                     // Create the files
                     let fileLI = document.createElement('li');
                     let fileSPAN = document.createElement('span');
-                    fileSPAN.setAttribute('class', 'file');
-                    fileSPAN.id = String(file);
-                    fileSPAN.innerText = path.basename(file);
+                    let fileExtension = this.getExtension(filePath);
+                    fileExtension !== "" ? fileExtension = fileExtension: fileExtension = "file";
+                    fileSPAN.setAttribute('class', fileExtension);
+                    fileSPAN.id = String(filePath);
+                    fileSPAN.innerText = path.basename(filePath);
                     fileLI.appendChild(fileSPAN);
                     nestedUL.appendChild(fileLI);
                     // Calculates how depth the node is, in order to give him correct padding
@@ -312,15 +345,15 @@ class Sidebar {
 
         this.recursiveAsyncReadDir(upperDirectory, (err, folders, files) => {
             if (folders) {
-                folders.forEach((folder) => {
+                folders.forEach((folderPath) => {
                     let folderLI = document.createElement('li');
                     let folderSPAN = document.createElement('span');
                     folderSPAN.setAttribute('class', 'folder');
-                    folderSPAN.id = String(folder)
-                    folderSPAN.innerText = path.basename(folder);
+                    folderSPAN.id = String(folderPath)
+                    folderSPAN.innerText = path.basename(folderPath);
                     folderLI.appendChild(folderSPAN);
                     // Check if the folder it is reading is the current folder we are, if it is, loads and childs the current nodes to the new father
-                    if (path.basename(folder) === currentFolderName) {
+                    if (path.basename(folderPath) === currentFolderName) {
                         this.fatherNode.removeAttribute('id');
                         this.fatherNode.setAttribute('class', 'nested');
                         folderLI.appendChild(this.fatherNode);
@@ -344,7 +377,7 @@ class Sidebar {
                     folderSPAN.style.paddingLeft = `${this.recursiveDepthCalc(folderLI, 0) * 0.5}cm`
                     folderSPAN.addEventListener('click', (event) => {
                         // Check if this folder is already loaded, if not, load it
-                        this.openFolderCallback(event, upperDirectory, folder, folderLI, folderSPAN);
+                        this.openFolderCallback(event, upperDirectory, folderPath, folderLI, folderSPAN);
                         this.ctrlSelection(event);
                         this.shiftSelection(event, folderSPAN);
 
@@ -354,12 +387,14 @@ class Sidebar {
                 });
             }
             if (files) {
-                files.forEach((file) => {
+                files.forEach((filePath) => {
                     let fileLI = document.createElement('li');
                     let fileSPAN = document.createElement('span');
-                    fileSPAN.setAttribute('class', 'file');
-                    fileSPAN.id = String(file)
-                    fileSPAN.innerText = path.basename(file);
+                    let fileExtension = this.getExtension(filePath);
+                    fileExtension !== "" ? fileExtension = fileExtension: fileExtension = "file";
+                    fileSPAN.setAttribute('class', fileExtension);
+                    fileSPAN.id = String(filePath)
+                    fileSPAN.innerText = path.basename(filePath);
                     fileLI.appendChild(fileSPAN);
                     newFatherNode.appendChild(fileLI);
                     fileSPAN.style.paddingLeft = `${this.recursiveDepthCalc(fileLI, 0) * 0.5}cm`;
@@ -401,7 +436,7 @@ class Sidebar {
         // Cleans the selection, because i tought it would be convenient
         while(this.selectionList.length > 0) {
             //FIXME Não faço ideia do pq esse erro ocorre aqui, um dia eu voltarei pra resolver, quando a luz da sabedoria tocar meu ser
-            try {document.getElementById(this.selectionList.pop()).classList.remove('selected');} catch(err) {alert("Volte por mim(っ °Д °;)っ");}
+            try {document.getElementById(this.selectionList.pop()).classList.remove('selected');} catch(err) {alert(err);}
         }
         let newUl = this.readDirectory(directory, node, openFolders);
         if(newUl.id === 'fatherNode') {
@@ -416,14 +451,6 @@ class Sidebar {
             newUl.classList.toggle('active');
             node.appendChild(newUl);
         }
-    }
-
-    getElOffset(el) {
-        const rect = el.getBoundingClientRect();
-        return {
-            left: rect.left + window.scrollX,
-            top: rect.top + window.scrollY
-        };
     }
 
     nameInputFunc(node, margin, writeFunction) {
@@ -486,8 +513,8 @@ class Sidebar {
                     }
                     else {
                         try {renameInput.remove()} catch(err) {console.log(err)};
-                        this.selectionList[this.selectionList.length - 1] = newName;
-                        node.setAttribute('id', newName);
+                        // this.selectionList[this.selectionList.length - 1] = newName;
+                        // node.setAttribute('id', newName);
                         this.refreshDirectory(process.cwd(), this.fatherNode);
                     }
                 });

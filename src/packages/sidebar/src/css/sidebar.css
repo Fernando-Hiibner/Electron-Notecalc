@@ -4,12 +4,21 @@
 }
 
 .sidebar {
+    width: 200px;
     font-size: 14px;
     overflow-y: auto;
     user-select: none;
     overflow-x: hidden;
     white-space: nowrap;
     font-family: 'Consolas';
+}
+
+.resize-handle {
+    width: 1px;
+    height: 100%;
+    display: flex;
+    cursor: ew-resize;
+    background-color: #cbd5e0;
 }
 
 .sidebar:focus {
