@@ -2,6 +2,14 @@ const path = require('path');
 const fs = require('fs');
 
 class SidebarCore {
+    dispatchFileClickEvent(caller, data) {
+        caller.dispatchEvent(
+            new CustomEvent('fileClicked', {detail: data
+                                            ,bubbles: true
+                                            ,cancelable: true
+                                            ,composed: false})
+        )
+    }
     recursiveAsyncReadDir(directory, done) {
         let folders = [];
         let files = [];
@@ -318,6 +326,9 @@ class Sidebar extends SidebarCore {
                     nestedUL.appendChild(fileLI);
                     // Calculates how depth the node is, in order to give him correct padding
                     fileSPAN.style.paddingLeft = `${this.recursiveDepthCalc(fileLI, 0) * 0.5}cm`;
+                    fileSPAN.addEventListener('dblclick', () => {
+                        this.dispatchFileClickEvent(fileSPAN, {filePath: fileSPAN.id});
+                    });
                     fileSPAN.addEventListener('click', (event) => {
                         this.ctrlSelection(event);
                         this.shiftSelection(event, fileSPAN);
@@ -398,6 +409,9 @@ class Sidebar extends SidebarCore {
                     fileLI.appendChild(fileSPAN);
                     newFatherNode.appendChild(fileLI);
                     fileSPAN.style.paddingLeft = `${this.recursiveDepthCalc(fileLI, 0) * 0.5}cm`;
+                    fileSPAN.addEventListener('dblclick', () => {
+                        this.dispatchFileClickEvent(fileSPAN, {filePath: fileSPAN.id});
+                    });
                     fileSPAN.addEventListener('click', (event) => {
                         this.ctrlSelection(event);
                         this.shiftSelection(event, fileSPAN);

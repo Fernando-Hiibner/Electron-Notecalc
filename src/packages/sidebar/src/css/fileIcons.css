@@ -106,3 +106,18 @@
     display: inline-block;
     font-family: 'Droid Sans Mono';
 }
+
+.db::before {
+    color: #d3bc0b;
+    content: "\e706";
+    margin-right: 6px;
+    display: inline-block;
+    font-family: 'Droid Sans Mono';
+}
+
+.baozi::before {
+    content: url("./baozi.png");
+    margin-right: 6px;
+    display: inline-block;
+    font-family: 'Droid Sans Mono';
+}

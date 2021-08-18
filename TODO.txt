@@ -1,9 +1,21 @@
 // Fazendo
-TODO Selecioar o arquivo/Pasta que foi criada / renomeada
+TODO Implementar as funções básicas pro editor ficar realmente usavel, abrir e salvar arquivos
+     TODO Salvar
+     TODO Abrir
+     TODO Resize de imagens e videos
+     TODO Polir todas as formatações
+
+// Todo / Fixme | Segundo plano mas sempre Fazendo
+TODO Ir adicionando mais extensões no fileIcons.css
+
+// Todo / Fixme | Prioridade -> 1
+TODO Mover e copiar arquivos na sidebar
 
 TODO Menu de contexto na sidebar
      OBS Muito importante, está em prioridade 2 apenas porque os de prioridade 1 são bugs e implementações necessárias pra ser a base desse e outros
-// Todo / Fixme | Prioridade -> 1
+
+TODO Selecioar o arquivo/Pasta que foi criada / renomeada
+
 TODO Navegação pela sidebar com as setas do teclado, enter para simular o clique, delete para deletar e f2 para renomear
      OBS Obviamente compativel com o Control e o Shift, feito pra ser uma outra forma de navegar pela sidebar
 // Todo / Fixme | Prioridade -> 2

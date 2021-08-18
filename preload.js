@@ -2,7 +2,14 @@ const {toolbarOptions, showColorPicker} = require('quill-increment');
 const {contextBridge} = require('electron');
 const highlight = require('highlight.js');
 const Sidebar = require('sidebar');
+
+const fs = require('fs');
+
 const Quill = require('quill');
+const ImageEdit  = require('quill-image-edit-module');
+Quill.register('modules/imageEdit', ImageEdit);
+
+var Delta = Quill.import('delta');
 
 const path = require('path');
 
@@ -13,6 +20,9 @@ window.addEventListener('DOMContentLoaded', () => {
     let editor = new Quill('.editor', {
         theme: 'snow',
         modules: {
+            imageEdit: {
+                modules: ['Resize', 'DisplaySize', 'Toolbar', 'Delete'],
+            },
             clipboard: {
                 matchVisual: true
             },
@@ -23,6 +33,11 @@ window.addEventListener('DOMContentLoaded', () => {
         },
         scrollingContainer: '#scrolling-container',
         placeholder: "Digite aqui..."
+    });
+
+    let changes = new Delta();
+    editor.on('text-change', (delta) => {
+        changes = changes.compose(delta);
     });
 
     let toolbar = editor.getModule('toolbar');
@@ -46,5 +61,18 @@ window.addEventListener('DOMContentLoaded', () => {
             console.log("First element: ", sidebar.selectionList[0]);
             console.log("Last element: ", sidebar.selectionList[sidebar.selectionList.length - 1]);
         }
+    });
+
+    window.addEventListener('keyup', (event) => {
+        if(event.ctrlKey && event.key === 's') {
+            //fs.writeFileSync('./teste.txt', JSON.stringify(editor.getContents()))
+            fs.writeFileSync('./teste.html', editor.root.innerHTML);
+        }
+        if(event.ctrlKey && event.key === 't') {
+            editor.root.innerHTML = fs.readFileSync('./teste.html');
+        }
+    });
+    window.addEventListener('fileClicked', (event) => {
+        editor.root.innerHTML = fs.readFileSync(event.detail.filePath);
     });
 });

@@ -21,7 +21,13 @@
     "electron-tabs": "^0.15.0",
     "highlight.js": "^11.2.0",
     "quill": "^1.3.6",
+    "quill-image-drop-module": "^1.0.3",
+    "quill-image-edit-module": "^0.1.6",
+    "quill-image-resize-module": "^3.0.0",
     "quill-increment": "file:src/packages/quill-increments",
+    "quill-resize-module": "^1.2.4",
+    "quill-video-resize": "^1.0.0",
+    "quill-video-resize-module": "^1.0.2",
     "sidebar": "file:src/packages/sidebar"
   }
 }
