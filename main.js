@@ -1,5 +1,5 @@
 // const {app, BrowserWindow, BrowserView, Menu, MenuItem} = require('electron');
-const {app, BrowserWindow, Menu, MenuItem} = require('electron');
+const {app, BrowserWindow, Menu, MenuItem, ipcMain, dialog} = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -25,6 +25,13 @@ function createMainWindow() {
     // })
 
     win.loadFile('index.html');
+
+    ipcMain.handle('showDialog', async (event, dialogType, properties) => {
+        if(dialogType === 'save') {
+            const path = await dialog.showSaveDialog(win, properties);
+            return path
+        }
+    })
 }
 
 // app.commandLine.appendSwitch('widevine-cdm-path', 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\92.0.4515.131\\WidevineCdm\\_platform_specific\\win_x64\\widevinecdm.dll')

@@ -7,3 +7,7 @@
 #scrolling-container {
     overflow-y: auto;
 }
+
+.ql-toolbar {
+    position: sticky;
+}

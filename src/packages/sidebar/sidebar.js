@@ -2,6 +2,10 @@ const path = require('path');
 const fs = require('fs');
 
 class SidebarCore {
+    constructor(parentFolder, currentWorkingFile) {
+        this.processCWD = parentFolder;
+        this.currentWorkingFile = currentWorkingFile;
+    }
     dispatchFileClickEvent(caller, data) {
         caller.dispatchEvent(
             new CustomEvent('fileClicked', {detail: data
@@ -59,9 +63,9 @@ class SidebarCore {
     }
 }
 class Sidebar extends SidebarCore {
-    constructor(parentNode, paned = false, hotkeys = true) {
+    constructor(parentNode, parentFolder, currentWorkingFile, paned = false, hotkeys = true) {
         //Instantiate the super class
-        super();
+        super(parentFolder, currentWorkingFile);
         // Creating the sidebar div in the DOM
         this.sidebar = document.createElement('div');
         this.sidebar.setAttribute('class', 'sidebar');
@@ -82,8 +86,8 @@ class Sidebar extends SidebarCore {
         this.upperFolderButton.setAttribute('class', 'sidebarHeaderButtons');
         this.upperFolderButton.setAttribute('id', 'upperFolderButton');
         this.upperFolderButton.addEventListener('click', () => {
-            if (path.resolve(process.cwd(), '..') !== process.cwd()) {
-                this.readUpperDirectory();
+            if (path.resolve(this.processCWD, '..') !== this.processCWD) {
+                this.readDirectory(path.resolve(this.processCWD, '..'), this.fatherNode, [], true);
             }
         });
 
@@ -124,7 +128,7 @@ class Sidebar extends SidebarCore {
         this.refreshButton.setAttribute('class', 'sidebarHeaderButtons');
         this.refreshButton.setAttribute('id', 'refreshButton');
         this.refreshButton.addEventListener('click', () => {
-            this.refreshDirectory(process.cwd(), this.fatherNode);
+            this.refreshDirectory(this.processCWD, this.fatherNode);
         });
 
         this.sidebarHeaderButtonsDiv.appendChild(this.newFileButton);
@@ -140,11 +144,12 @@ class Sidebar extends SidebarCore {
         this.sidebar.appendChild(this.sidebarHeaderDiv);
         this.sidebar.appendChild(this.fatherNode);
 
-        this.readDirectory(process.cwd(), this.fatherNode);
+        this.readDirectory(this.processCWD, this.fatherNode);
 
         // List that holds the selections made in the sidebar in order
         this.selectionList = [];
 
+        setInterval(() => {this.checkForChanges()}, 200);
         // Adding the focusout event listener to the window, so the selection gets cleared when clicking outside the bar
         window.addEventListener('click', (event) => {
             if(!this.sidebar.contains(event.target) || event.target === this.sidebar) {
@@ -201,7 +206,7 @@ class Sidebar extends SidebarCore {
                     this.deleteCallback();
                 }
                 else if(event.key === 'F5') {
-                    this.refreshDirectory(process.cwd(), this.fatherNode);
+                    this.refreshDirectory(this.processCWD, this.fatherNode);
                 }
                 else if(event.ctrlKey && event.key === 'n') {
                     this.newFileButtonClickCallback();
@@ -264,16 +269,26 @@ class Sidebar extends SidebarCore {
         }
     }
 
-    readDirectory(directory, node, openFolders = []) {
+    readDirectory(directory, node, openFolders = [], upper = false) {
         // Create a new UL if node !== 'fatherNode' (node === Sub-directory)
         let nestedUL = undefined;
-        if (node.id !== 'fatherNode') {
-            nestedUL = document.createElement('ul');
-            nestedUL.setAttribute('class', 'nested');
-            node.appendChild(nestedUL);
+        let newFatherNode = undefined;
+        let currentFolderPath = this.processCWD;
+        if(!upper) {
+            if (node.id !== 'fatherNode') {
+                nestedUL = document.createElement('ul');
+                nestedUL.setAttribute('class', 'nested');
+                node.appendChild(nestedUL);
+            }
+            else {
+                nestedUL = node;
+            }
         }
         else {
-            nestedUL = node;
+            // Creating the new father node that will take the place of the older
+            newFatherNode = document.createElement('ul');
+            newFatherNode.setAttribute('id', 'fatherNode');
+            this.sidebar.appendChild(newFatherNode);
         }
 
         // Async read the directory and create the folders and files in the sidebar
@@ -287,7 +302,34 @@ class Sidebar extends SidebarCore {
                     folderSPAN.id = String(folderPath)
                     folderSPAN.innerText = path.basename(folderPath);
                     folderLI.appendChild(folderSPAN);
-                    nestedUL.appendChild(folderLI);
+                    // Check if the folder it is reading is the current folder we are, if it is, loads and childs the current nodes to the new father
+                    if(!upper) {
+                        nestedUL.appendChild(folderLI);
+                    }
+                    else {
+                        console.log(folderPath === currentFolderPath)
+                        if (folderPath === currentFolderPath) {
+                            this.fatherNode.removeAttribute('id');
+                            this.fatherNode.setAttribute('class', 'nested');
+                            folderLI.appendChild(this.fatherNode);
+                            newFatherNode.appendChild(folderLI);
+                            let subLi = this.fatherNode.getElementsByTagName('LI');
+                            for (let i = 0; i < subLi.length ; i++) {
+                                let el = subLi[i];
+                                let elSpans =  el.getElementsByTagName('SPAN');
+                                for (let z = 0; z < elSpans.length; z++) {
+                                    elSpans[z].style.paddingLeft = `${this.recursiveDepthCalc(el, 0) * 0.5}cm`;
+                                }
+                            }
+                            this.fatherNode.classList.toggle('active');
+                            this.fatherNode = newFatherNode;
+
+                            folderSPAN.classList.toggle('folder-down');
+                        }
+                        else {
+                            newFatherNode.appendChild(folderLI);
+                        }
+                    }
                     // Calculates how depth the node is, in order to give him correct padding
                     folderSPAN.style.paddingLeft = `${this.recursiveDepthCalc(folderLI, 0) * 0.5}cm`
                     // Folder click event
@@ -300,16 +342,18 @@ class Sidebar extends SidebarCore {
                         folderSPAN.classList.toggle('selected');
                         this.selectionList.push(folderSPAN.id);
                     });
-                    if(openFolders.includes(folderSPAN.id)) {
-                        // Check if this folder is already loaded, if not, load it
-                        if (!folderSPAN.parentElement.querySelector(".nested")) {
-                            this.readDirectory(path.join(directory, path.basename(folderPath)), folderLI, openFolders);
-                        }
-                        folderSPAN.parentElement.querySelector(".nested").classList.toggle("active");
-                        folderSPAN.classList.toggle("folder-down");
-                    };
-                    // Check if this folder is in selectionList
-                    if(this.selectionList.includes(folderSPAN.id)) folderSPAN.classList.toggle('selected');
+                    if(!upper) {
+                        if(openFolders.includes(folderSPAN.id)) {
+                            // Check if this folder is already loaded, if not, load it
+                            if (!folderSPAN.parentElement.querySelector(".nested")) {
+                                this.readDirectory(path.join(directory, path.basename(folderPath)), folderLI, openFolders);
+                            }
+                            folderSPAN.parentElement.querySelector(".nested").classList.toggle("active");
+                            folderSPAN.classList.toggle("folder-down");
+                        };
+                        // Check if this folder is in selectionList
+                        if(this.selectionList.includes(folderSPAN.id)) folderSPAN.classList.toggle('selected');
+                    }
                 });
             }
             if (files) {
@@ -318,23 +362,26 @@ class Sidebar extends SidebarCore {
                     let fileLI = document.createElement('li');
                     let fileSPAN = document.createElement('span');
                     let fileExtension = this.getExtension(filePath);
-                    fileExtension !== "" ? fileExtension = fileExtension: fileExtension = "file";
-                    fileSPAN.setAttribute('class', fileExtension);
+                    fileExtension !== "" ? fileExtension = fileExtension: fileExtension = "unknown";
+                    fileSPAN.setAttribute('class', 'file');
+                    fileSPAN.classList.add(fileExtension);
                     fileSPAN.id = String(filePath);
                     fileSPAN.innerText = path.basename(filePath);
                     fileLI.appendChild(fileSPAN);
-                    nestedUL.appendChild(fileLI);
+                    upper? newFatherNode.appendChild(fileLI): nestedUL.appendChild(fileLI);
                     // Calculates how depth the node is, in order to give him correct padding
                     fileSPAN.style.paddingLeft = `${this.recursiveDepthCalc(fileLI, 0) * 0.5}cm`;
-                    fileSPAN.addEventListener('dblclick', () => {
-                        this.dispatchFileClickEvent(fileSPAN, {filePath: fileSPAN.id});
-                    });
                     fileSPAN.addEventListener('click', (event) => {
                         this.ctrlSelection(event);
                         this.shiftSelection(event, fileSPAN);
 
                         fileSPAN.classList.toggle('selected');
                         this.selectionList.push(fileSPAN.id);
+
+                        if(this.currentWorkingFile !== filePath && !event.ctrlKey && !event.shiftKey) {
+                            this.currentWorkingFile = filePath;
+                            this.dispatchFileClickEvent(fileSPAN, {filePath: fileSPAN.id});
+                        }
                     });
                     // Check if this file is in selectionList
                     if(this.selectionList.includes(fileSPAN.id)) fileSPAN.classList.toggle('selected');
@@ -342,101 +389,76 @@ class Sidebar extends SidebarCore {
             }
         });
 
-        return nestedUL;
+        if(upper) {
+            // Calculating the new folder name
+            this.processCWD = directory;
+            if(path.basename(this.processCWD).length <= 10) {
+                this.currentFolderName.innerText = path.basename(this.processCWD).toUpperCase();
+            }
+            else {
+                this.currentFolderName.innerText = path.basename(this.processCWD).toUpperCase().slice(0, this.sliceIndexFunc(sidebar.getBoundingClientRect().width)) + "...";
+            }
+        }
+        if(!upper) return nestedUL;
     }
 
-    readUpperDirectory() {
-        let upperDirectory = path.resolve(process.cwd(), '..');
-        let currentFolderName = path.basename(process.cwd());
-
-        // Creating the new father node that will take the place of the older
-        let newFatherNode = document.createElement('ul');
-        newFatherNode.setAttribute('id', 'fatherNode');
-        this.sidebar.appendChild(newFatherNode);
-
-        this.recursiveAsyncReadDir(upperDirectory, (err, folders, files) => {
-            if (folders) {
-                folders.forEach((folderPath) => {
-                    let folderLI = document.createElement('li');
-                    let folderSPAN = document.createElement('span');
-                    folderSPAN.setAttribute('class', 'folder');
-                    folderSPAN.id = String(folderPath)
-                    folderSPAN.innerText = path.basename(folderPath);
-                    folderLI.appendChild(folderSPAN);
-                    // Check if the folder it is reading is the current folder we are, if it is, loads and childs the current nodes to the new father
-                    if (path.basename(folderPath) === currentFolderName) {
-                        this.fatherNode.removeAttribute('id');
-                        this.fatherNode.setAttribute('class', 'nested');
-                        folderLI.appendChild(this.fatherNode);
-                        newFatherNode.appendChild(folderLI);
-                        let subLi = this.fatherNode.getElementsByTagName('LI');
-                        for (let i = 0; i < subLi.length ; i++) {
-                            let el = subLi[i];
-                            let elSpans =  el.getElementsByTagName('SPAN');
-                            for (let z = 0; z < elSpans.length; z++) {
-                                elSpans[z].style.paddingLeft = `${this.recursiveDepthCalc(el, 0) * 0.5}cm`;
-                            }
-                        }
-                        this.fatherNode.classList.toggle('active');
-                        this.fatherNode = newFatherNode;
-
-                        folderSPAN.classList.toggle('folder-down');
+    checkForChanges(directory) {
+        if(directory === undefined) {
+            directory = this.processCWD;
+        }
+        this.recursiveAsyncReadDir(directory, (err, folders, files) => {
+            let refresh = false;
+            if(folders) {
+                let loadedFolders = document.querySelectorAll('.folder');
+                folders.forEach((folderPATH) => {
+                    if(!!document.getElementById(folderPATH) === false) {
+                        console.log("Não tem pasta: ", folderPATH);
+                        refresh = true;
                     }
-                    else {
-                        newFatherNode.appendChild(folderLI);
+                });
+                loadedFolders.forEach((folderPATH) => {
+                    if(!folders.includes(folderPATH.id)) {
+                        console.log("Pasta carregada não contida: ", folderPATH.id);
+                        refresh = true;
                     }
-                    folderSPAN.style.paddingLeft = `${this.recursiveDepthCalc(folderLI, 0) * 0.5}cm`
-                    folderSPAN.addEventListener('click', (event) => {
-                        // Check if this folder is already loaded, if not, load it
-                        this.openFolderCallback(event, upperDirectory, folderPath, folderLI, folderSPAN);
-                        this.ctrlSelection(event);
-                        this.shiftSelection(event, folderSPAN);
-
-                        folderSPAN.classList.toggle('selected');
-                        this.selectionList.push(folderSPAN.id);
-                    });
                 });
             }
-            if (files) {
-                files.forEach((filePath) => {
-                    let fileLI = document.createElement('li');
-                    let fileSPAN = document.createElement('span');
-                    let fileExtension = this.getExtension(filePath);
-                    fileExtension !== "" ? fileExtension = fileExtension: fileExtension = "file";
-                    fileSPAN.setAttribute('class', fileExtension);
-                    fileSPAN.id = String(filePath)
-                    fileSPAN.innerText = path.basename(filePath);
-                    fileLI.appendChild(fileSPAN);
-                    newFatherNode.appendChild(fileLI);
-                    fileSPAN.style.paddingLeft = `${this.recursiveDepthCalc(fileLI, 0) * 0.5}cm`;
-                    fileSPAN.addEventListener('dblclick', () => {
-                        this.dispatchFileClickEvent(fileSPAN, {filePath: fileSPAN.id});
-                    });
-                    fileSPAN.addEventListener('click', (event) => {
-                        this.ctrlSelection(event);
-                        this.shiftSelection(event, fileSPAN);
-
-                        fileSPAN.classList.toggle('selected');
-                        this.selectionList.push(fileSPAN.id);
-                    });
+            if(files) {
+                let loadedFiles = document.querySelectorAll('.file');
+                files.forEach((filePATH) => {
+                    if(!!document.getElementById(filePATH) === false) {
+                        console.log("Não tem arquivo: ", filePATH);
+                        refresh = true;
+                    }
                 });
+                loadedFiles.forEach((filePATH) => {
+                    if(!files.includes(filePATH.id)) {
+                        console.log("Arquivo carregado não contido: ", filePATH.id);
+                        refresh = true;
+                    }
+                });
+            }
+
+            console.log(refresh);
+
+            if(refresh) {
+                this.refreshDirectory(this.processCWD, this.fatherNode, this.selectionList);
             }
         });
-
-        // Calculating the new folder name
-        process.chdir(upperDirectory);
-        if(path.basename(process.cwd()).length <= 10) {
-            this.currentFolderName.innerText = path.basename(process.cwd()).toUpperCase();
-        }
-        else {
-            this.currentFolderName.innerText = path.basename(process.cwd()).toUpperCase().slice(0, this.sliceIndexFunc(sidebar.getBoundingClientRect().width)) + "...";
-        }
     }
 
-    refreshDirectory(directory, node) {
+    refreshDirectory(directory, node, maintainSelections = []) {
         // Cleans the selection, because i tought it would be convenient
         while(this.selectionList.length > 0) {
-            try {document.getElementById(this.selectionList.pop()).classList.remove('selected');} catch(err) {alert(err);}
+            try {
+                if(maintainSelections.includes(this.selectionList[this.selectionList.length - 1])) {
+                    this.selectionList.pop();
+                }
+                else {
+                    document.getElementById(this.selectionList.pop()).classList.remove('selected');
+                }
+            }
+            catch(err) {alert(err);}
         }
 
         let childs = node.getElementsByTagName('UL');
@@ -528,7 +550,7 @@ class Sidebar extends SidebarCore {
                         try {renameInput.remove()} catch(err) {console.log(err)};
                         this.selectionList[this.selectionList.length - 1] = newName;
                         node.setAttribute('id', newName);
-                        this.refreshDirectory(process.cwd(), this.fatherNode);
+                        this.refreshDirectory(this.processCWD, this.fatherNode);
                     }
                 });
             }
@@ -584,14 +606,14 @@ class Sidebar extends SidebarCore {
         }
         else {
             this.nameInputFunc(this.fatherNode, '0.5cm', (nameInput) => {
-                fs.writeFile(path.join(process.cwd(), nameInput.value), "", (err) => {
+                fs.writeFile(path.join(this.processCWD, nameInput.value), "", (err) => {
                     if(err) {
                         alert(err);
                         try {nameInput.remove()} catch(err) {console.log(err)};
                     }
                     else {
                         try {nameInput.remove()} catch(err) {console.log(err)};
-                        this.refreshDirectory(process.cwd(), this.fatherNode);
+                        this.refreshDirectory(this.processCWD, this.fatherNode);
                     }
                 })
             })
@@ -646,14 +668,14 @@ class Sidebar extends SidebarCore {
         }
         else {
             this.nameInputFunc(this.fatherNode, '0.5cm', (nameInput) => {
-                fs.mkdir(path.join(process.cwd(), nameInput.value), (err) => {
+                fs.mkdir(path.join(this.processCWD, nameInput.value), (err) => {
                     if (err) {
                         alert(err);
                         try {nameInput.remove()} catch(err) {console.log(err)};
                     }
                     else {
                         try {nameInput.remove()} catch(err) {console.log(err)};
-                        this.refreshDirectory(process.cwd(), this.fatherNode);
+                        this.refreshDirectory(this.processCWD, this.fatherNode);
                     }
                 });
             })
@@ -668,7 +690,7 @@ class Sidebar extends SidebarCore {
             while(this.selectionList.length > 0) {
                 fs.rm(this.selectionList.pop(), {recursive: true, force: true}, () => {});
             }
-            this.refreshDirectory(process.cwd(), this.fatherNode);
+            this.refreshDirectory(this.processCWD, this.fatherNode);
         }
     }
 
@@ -698,15 +720,15 @@ class Sidebar extends SidebarCore {
     }
 
     sliceMainFolderName(sliceIndex, currentFolderName) {
-        if(path.basename(process.cwd()).length <= 10 || path.basename(process.cwd()).length <= sliceIndex) {
-            currentFolderName.innerText = path.basename(process.cwd()).toUpperCase();
+        if(path.basename(this.processCWD).length <= 10 || path.basename(this.processCWD).length <= sliceIndex) {
+            currentFolderName.innerText = path.basename(this.processCWD).toUpperCase();
         }
         else {
             if(sliceIndex < 8) {
                 sliceIndex = 8;
             }
-            if(path.basename(process.cwd())[sliceIndex-1] === ' ') sliceIndex -= 1;
-            currentFolderName.innerText = path.basename(process.cwd()).toUpperCase().slice(0, sliceIndex) + "...";
+            if(path.basename(this.processCWD)[sliceIndex-1] === ' ') sliceIndex -= 1;
+            currentFolderName.innerText = path.basename(this.processCWD).toUpperCase().slice(0, sliceIndex) + "...";
         }
     }
 }

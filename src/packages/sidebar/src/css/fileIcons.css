@@ -3,7 +3,7 @@
     src: url('../fonts/Droid Sans Mono Nerd Font Complete.otf');
 }
 
-.file::before {
+.unknown::before {
     color: #0691dc;
     content: "\f15b";
     margin-right: 6px;
