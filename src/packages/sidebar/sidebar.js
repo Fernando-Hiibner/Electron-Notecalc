@@ -14,7 +14,7 @@ class SidebarCore {
                                             ,composed: false})
         )
     }
-    recursiveAsyncReadDir(directory, done) {
+    AsyncReadDir(directory, done) {
         let folders = [];
         let files = [];
         fs.readdir(directory, function (err, list) {
@@ -31,6 +31,26 @@ class SidebarCore {
                 });
             })();
         });
+    }
+
+    recursiveSyncReadDir(directories, index) {
+        let folders = [];
+        let files = [];
+        while(index != directories.length) {
+            let dirItems = fs.readdirSync(directories[index]);
+            for(let i = 0; i < dirItems.length; i++) {
+                let item = path.resolve(directories[index], dirItems[i])
+                let stat = fs.lstatSync(item);
+                if(stat && stat.isDirectory()) {
+                    folders.push(item);
+                }
+                else if(stat && stat.isFile()) {
+                    files.push(item);
+                }
+            }
+            index++;
+        }
+        return {folders: folders, files: files};
     }
 
     recursiveDepthCalc(el, sum) {
@@ -148,6 +168,7 @@ class Sidebar extends SidebarCore {
 
         // List that holds the selections made in the sidebar in order
         this.selectionList = [];
+        this.openFolders = [];
 
         setInterval(() => {this.checkForChanges()}, 200);
         // Adding the focusout event listener to the window, so the selection gets cleared when clicking outside the bar
@@ -225,6 +246,15 @@ class Sidebar extends SidebarCore {
             }
             span.parentElement.querySelector(".nested").classList.toggle("active");
             span.classList.toggle("folder-down");
+            if(span.classList.contains('folder-down')) {
+                this.openFolders.push(span.id);
+            }
+            else {
+                let index = this.openFolders.indexOf(span.id);
+                if(index > -1) {
+                    this.openFolders.splice(index, 1)
+                }
+            }
         }
     }
 
@@ -269,7 +299,7 @@ class Sidebar extends SidebarCore {
         }
     }
 
-    readDirectory(directory, node, openFolders = [], upper = false) {
+    readDirectory(directory, node, upper = false) {
         // Create a new UL if node !== 'fatherNode' (node === Sub-directory)
         let nestedUL = undefined;
         let newFatherNode = undefined;
@@ -292,7 +322,7 @@ class Sidebar extends SidebarCore {
         }
 
         // Async read the directory and create the folders and files in the sidebar
-        this.recursiveAsyncReadDir(directory, (err, folders, files) => {
+        this.AsyncReadDir(directory, (err, folders, files) => {
             if (folders) {
                 folders.forEach((folderPath) => {
                     // Create the folders
@@ -343,10 +373,10 @@ class Sidebar extends SidebarCore {
                         this.selectionList.push(folderSPAN.id);
                     });
                     if(!upper) {
-                        if(openFolders.includes(folderSPAN.id)) {
+                        if(this.openFolders.includes(folderSPAN.id)) {
                             // Check if this folder is already loaded, if not, load it
                             if (!folderSPAN.parentElement.querySelector(".nested")) {
-                                this.readDirectory(path.join(directory, path.basename(folderPath)), folderLI, openFolders);
+                                this.readDirectory(path.join(directory, path.basename(folderPath)), folderLI);
                             }
                             folderSPAN.parentElement.querySelector(".nested").classList.toggle("active");
                             folderSPAN.classList.toggle("folder-down");
@@ -391,6 +421,7 @@ class Sidebar extends SidebarCore {
 
         if(upper) {
             // Calculating the new folder name
+            this.openFolders.push(this.processCWD);
             this.processCWD = directory;
             if(path.basename(this.processCWD).length <= 10) {
                 this.currentFolderName.innerText = path.basename(this.processCWD).toUpperCase();
@@ -406,45 +437,44 @@ class Sidebar extends SidebarCore {
         if(directory === undefined) {
             directory = this.processCWD;
         }
-        this.recursiveAsyncReadDir(directory, (err, folders, files) => {
-            let refresh = false;
-            if(folders) {
-                let loadedFolders = document.querySelectorAll('.folder');
-                folders.forEach((folderPATH) => {
-                    if(!!document.getElementById(folderPATH) === false) {
-                        console.log("Não tem pasta: ", folderPATH);
-                        refresh = true;
-                    }
-                });
-                loadedFolders.forEach((folderPATH) => {
-                    if(!folders.includes(folderPATH.id)) {
-                        console.log("Pasta carregada não contida: ", folderPATH.id);
-                        refresh = true;
-                    }
-                });
-            }
-            if(files) {
-                let loadedFiles = document.querySelectorAll('.file');
-                files.forEach((filePATH) => {
-                    if(!!document.getElementById(filePATH) === false) {
-                        console.log("Não tem arquivo: ", filePATH);
-                        refresh = true;
-                    }
-                });
-                loadedFiles.forEach((filePATH) => {
-                    if(!files.includes(filePATH.id)) {
-                        console.log("Arquivo carregado não contido: ", filePATH.id);
-                        refresh = true;
-                    }
-                });
-            }
+        let foldersToAnalize = this.openFolders.concat([directory]);
+        let loadedFolders = document.querySelectorAll('.folder');
+        let loadedFiles = document.querySelectorAll('.file');
+        let refresh = false;
 
-            console.log(refresh);
+        let directoriesItems = this.recursiveSyncReadDir(foldersToAnalize, 0);
+        let foldersPath = directoriesItems.folders;
+        let filesPath = directoriesItems.files;
 
-            if(refresh) {
-                this.refreshDirectory(this.processCWD, this.fatherNode, this.selectionList);
+        foldersPath.forEach((folderPATH) => {
+            if(!!document.getElementById(folderPATH) === false) {
+                //console.log("Não tem pasta: ", folderPATH);
+                refresh = true;
             }
         });
+        loadedFolders.forEach((folderPATH) => {
+            if(!foldersPath.includes(folderPATH.id)) {
+                //console.log("Pasta carregada não contida: ", folderPATH.id);
+                refresh = true;
+            }
+        });
+
+        filesPath.forEach((filePATH) => {
+            if(!!document.getElementById(filePATH) === false) {
+                //console.log("Não tem arquivo: ", filePATH);
+                refresh = true;
+            }
+        });
+        loadedFiles.forEach((filePATH) => {
+            if(!filesPath.includes(filePATH.id)) {
+                //console.log("Arquivo carregado não contido: ", filePATH.id);
+                refresh = true;
+            }
+        });
+
+        if(refresh) {
+            this.refreshDirectory(this.processCWD, this.fatherNode, this.selectionList);
+        }
     }
 
     refreshDirectory(directory, node, maintainSelections = []) {
@@ -462,18 +492,12 @@ class Sidebar extends SidebarCore {
         }
 
         let childs = node.getElementsByTagName('UL');
-        let openFolders = [];
-        for (let i = 0; i < childs.length; i++) {
-            if (childs[i].classList.contains('active')) {
-                openFolders.push(childs[i].parentElement.firstChild.id);
-            }
-        }
         for(let i = 0; i < childs.length; i++) {
             if (childs[i].tagName === 'UL') {
                 childs[i].parentElement.removeChild(childs[i]);
             }
         }
-        let newUl = this.readDirectory(directory, node, openFolders);
+        let newUl = this.readDirectory(directory, node);
         if(newUl.id === 'fatherNode') {
             while(node.firstChild) {
                 node.removeChild(node.firstChild);

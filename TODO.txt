@@ -1,11 +1,11 @@
 // Fazendo
-TOOD Relacionado ao todo de baixo, o "openFolders" tem que ser atributo de classe agora, pro check directory checar direito
 TODO talvez fosse interessante dar uma revisada marota em como a sidebar ta funcionado no geral, rever o que pode ser melhorado, refinado, otimizado e etc
 
 
 TODO Implementar as funções básicas pro editor ficar realmente usavel, abrir e salvar arquivos
-     TODO Salvar
-     TODO Abrir
+     DONE Salvar
+     TODO Abrir - SEMI DONE
+     TODO Polir tudo essas implementações ao extremo pra ficar fino do fino
      TODO Resize de imagens e videos
      TODO Polir todas as formatações
 
@@ -56,3 +56,4 @@ DONE Deletar coisas
 OBS: Esses dois é por seleção e atalho no teclado
 //FIXED Arrumando o BO do refreshDirectory e as seleções, o BO é que ele tava depois da remoção das childs do Node (pq o refresh directory remove só os nodes filhos do node enviado por questões de performance)
 //DONE tentativa de considerar só o ultimo da seleção (feito)
+DONE Relacionado ao todo de baixo, o "openFolders" tem que ser atributo de classe agora, pro check directory checar direito

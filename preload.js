@@ -22,6 +22,9 @@ window.addEventListener('DOMContentLoaded', () => {
         },
         cwd: () => {
             console.log(process.cwd());
+        },
+        debugOpenFolders: () => {
+            console.log(app.openFolders);
         }
     });
 });
