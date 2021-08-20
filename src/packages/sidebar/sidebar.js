@@ -6,6 +6,8 @@ class SidebarCore {
         this.processCWD = parentFolder;
         this.currentWorkingFile = currentWorkingFile;
     }
+
+    // Dispatch an special event when clicking on files
     dispatchFileClickEvent(caller, data) {
         caller.dispatchEvent(
             new CustomEvent('fileClicked', {detail: data
@@ -14,6 +16,8 @@ class SidebarCore {
                                             ,composed: false})
         )
     }
+
+    // Asynchronous read one directory
     AsyncReadDir(directory, done) {
         let folders = [];
         let files = [];
@@ -33,7 +37,8 @@ class SidebarCore {
         });
     }
 
-    recursiveSyncReadDir(directories, index) {
+    // Synchronous read directories
+    SyncReadDirs(directories, index) {
         let folders = [];
         let files = [];
         while(index != directories.length) {
@@ -53,6 +58,7 @@ class SidebarCore {
         return {folders: folders, files: files};
     }
 
+    // Recursively calculates de depth of a node in the node tree
     recursiveDepthCalc(el, sum) {
         if (el.parentElement.id === 'fatherNode') {
             return sum+1;
@@ -65,7 +71,8 @@ class SidebarCore {
         }
     }
 
-    getElOffset(el) {
+    // Get the left and top offset of a element
+    getElementOffset(el) {
         const rect = el.getBoundingClientRect();
         return {
             left: rect.left + window.scrollX,
@@ -73,6 +80,7 @@ class SidebarCore {
         };
     }
 
+    // Get the extension from a file
     getExtension(path) {
         let basename = path.split(/[\\/]/).pop()
            ,pos = basename.lastIndexOf(".");
@@ -84,9 +92,10 @@ class SidebarCore {
 }
 class Sidebar extends SidebarCore {
     constructor(parentNode, parentFolder, currentWorkingFile, paned = false, hotkeys = true) {
-        //Instantiate the super class
+        // Instantiate the super class
         super(parentFolder, currentWorkingFile);
-        // Creating the sidebar div in the DOM
+
+        // Creating the sidebar
         this.sidebar = document.createElement('div');
         this.sidebar.setAttribute('class', 'sidebar');
         this.sidebar.setAttribute('id', 'sidebar');
@@ -151,26 +160,34 @@ class Sidebar extends SidebarCore {
             this.refreshDirectory(this.processCWD, this.fatherNode);
         });
 
+        // Adding the buttons in their div
         this.sidebarHeaderButtonsDiv.appendChild(this.newFileButton);
         this.sidebarHeaderButtonsDiv.appendChild(this.newFolderButton);
         this.sidebarHeaderButtonsDiv.appendChild(this.refreshButton);
         this.sidebarHeaderButtonsDiv.appendChild(this.collapseButton);
 
+        // Adding everything in the header div
         this.sidebarHeaderDiv.appendChild(this.upperFolderButton);
         this.sidebarHeaderDiv.appendChild(this.currentFolderName);
         this.sidebarHeaderDiv.appendChild(this.sidebarHeaderButtonsDiv);
+
+        // Slice the folder name in the sidebarHeader in case it is longer than the sidebar can hold
         this.sliceMainFolderName(10, this.currentFolderName);
 
+        // Append the header and the fatherNode to the sidebar
         this.sidebar.appendChild(this.sidebarHeaderDiv);
         this.sidebar.appendChild(this.fatherNode);
 
+        // Do the initial readDirectory in the current working directory and inserting in the father node
         this.readDirectory(this.processCWD, this.fatherNode);
 
-        // List that holds the selections made in the sidebar in order
+        // Lists that holds the selections made in the sidebar in order and the folders that are open
         this.selectionList = [];
         this.openFolders = [];
 
+        // Set a function to be called every 200ms to check if something external affected the working directory
         setInterval(() => {this.checkForChanges()}, 200);
+
         // Adding the focusout event listener to the window, so the selection gets cleared when clicking outside the bar
         window.addEventListener('click', (event) => {
             if(!this.sidebar.contains(event.target) || event.target === this.sidebar) {
@@ -180,6 +197,7 @@ class Sidebar extends SidebarCore {
             }
         });
 
+        // Adding the escape event listener to the window, so the selection gets cleared when clicking outside the bar
         window.addEventListener('keyup', (event) => {
             if(event.key === 'Escape') {
                 while(this.selectionList.length > 0) {
@@ -188,6 +206,7 @@ class Sidebar extends SidebarCore {
             }
         });
 
+        // Create the links to all the css used by the sidebar
         this.mainCSSLink = document.createElement('link');
         this.mainCSSLink.setAttribute('href', path.join(__dirname, 'src/css/sidebar.css'));
         this.mainCSSLink.setAttribute('rel', 'stylesheet');
@@ -196,8 +215,11 @@ class Sidebar extends SidebarCore {
         this.iconCSSLink.setAttribute('href', path.join(__dirname, 'src/css/fileIcons.css'));
         this.iconCSSLink.setAttribute('rel', 'stylesheet');
 
+        // Append the links to the head of the DOM
         document.getElementsByTagName('HEAD')[0].appendChild(this.mainCSSLink);
         document.getElementsByTagName('HEAD')[0].appendChild(this.iconCSSLink);
+
+        // If you choose it to be paned this section of code will create its div and script
         if(paned) {
             this.panedHandle = document.createElement('div');
             this.panedHandle.setAttribute('class', 'resize-handle');
@@ -212,6 +234,7 @@ class Sidebar extends SidebarCore {
             document.getElementsByTagName('BODY')[0].appendChild(this.panedJSScript);
         }
 
+        // If you choose it to have hotkeys this section of code will create its script
         if(hotkeys) {
             this.hotkeysJSScript = document.createElement('script');
             this.hotkeysJSScript.setAttribute('src', path.join(__dirname, "src/script/hotkeys.js"));
@@ -239,6 +262,7 @@ class Sidebar extends SidebarCore {
         }
     }
 
+    // Handles the click on the folders
     openFolderCallback(event, directory, folder, li, span) {
         if(!event.ctrlKey && !event.shiftKey) {
             if (!span.parentElement.querySelector(".nested")) {
@@ -247,17 +271,20 @@ class Sidebar extends SidebarCore {
             span.parentElement.querySelector(".nested").classList.toggle("active");
             span.classList.toggle("folder-down");
             if(span.classList.contains('folder-down')) {
+                console.log("added: ", span.id);
                 this.openFolders.push(span.id);
             }
             else {
                 let index = this.openFolders.indexOf(span.id);
                 if(index > -1) {
-                    this.openFolders.splice(index, 1)
+                    console.log("removed: ", span.id);
+                    this.openFolders.splice(index, 1);
                 }
             }
         }
     }
 
+    // Handles the ctrl selection
     ctrlSelection(event) {
         if(document.getElementsByClassName('selected')[0] !== undefined && !event.ctrlKey && !event.shiftKey) {
             while(this.selectionList.length > 0) {
@@ -266,6 +293,7 @@ class Sidebar extends SidebarCore {
         }
     }
 
+    // Handles the shift selection
     shiftSelection(event, span) {
         if(this.selectionList[0] !== undefined && event.shiftKey) {
             let filesInSelectionRange = document.getElementsByTagName("SPAN");
@@ -299,6 +327,7 @@ class Sidebar extends SidebarCore {
         }
     }
 
+    // Read the directory and create the elements in the sidebar (folders and files)
     readDirectory(directory, node, upper = false) {
         // Create a new UL if node !== 'fatherNode' (node === Sub-directory)
         let nestedUL = undefined;
@@ -433,50 +462,75 @@ class Sidebar extends SidebarCore {
         if(!upper) return nestedUL;
     }
 
+    // Check for changes made in the working directory and active subdirectories by external sources
+    // FIXME Ta dando um xabu onde pastas excluidas não saem do this.openFolders e isso ta dando problema
+    // FIXME E agora que saem alguns não entram
     checkForChanges(directory) {
         if(directory === undefined) {
             directory = this.processCWD;
         }
+
+        // Check for folders that don't exist anymore
+        let filteredOpenFolders = [];
+        for(let i = 0; i < this.openFolders; i++) {
+            if(fs.existsSync(this.openFolders[i])) {
+                console.log(this.openFolders[i])
+                filteredOpenFolders.push(this.openFolders[i]);
+            }
+        }
+        this.openFolders = filteredOpenFolders;
+
         let foldersToAnalize = this.openFolders.concat([directory]);
         let loadedFolders = document.querySelectorAll('.folder');
         let loadedFiles = document.querySelectorAll('.file');
-        let refresh = false;
+        let foldersToRefresh = []
 
-        let directoriesItems = this.recursiveSyncReadDir(foldersToAnalize, 0);
+        let directoriesItems = this.SyncReadDirs(foldersToAnalize, 0);
         let foldersPath = directoriesItems.folders;
         let filesPath = directoriesItems.files;
+
 
         foldersPath.forEach((folderPATH) => {
             if(!!document.getElementById(folderPATH) === false) {
                 //console.log("Não tem pasta: ", folderPATH);
-                refresh = true;
+                if(!foldersToRefresh.includes(folderPATH)) foldersToRefresh.push(folderPATH);
             }
         });
         loadedFolders.forEach((folderPATH) => {
             if(!foldersPath.includes(folderPATH.id)) {
                 //console.log("Pasta carregada não contida: ", folderPATH.id);
-                refresh = true;
+                if(!foldersToRefresh.includes(folderPATH.id)) foldersToRefresh.push(folderPATH.id);
             }
         });
 
         filesPath.forEach((filePATH) => {
             if(!!document.getElementById(filePATH) === false) {
                 //console.log("Não tem arquivo: ", filePATH);
-                refresh = true;
+                if(!foldersToRefresh.includes(path.dirname(filePATH))) foldersToRefresh.push(path.dirname(filePATH));
             }
         });
         loadedFiles.forEach((filePATH) => {
             if(!filesPath.includes(filePATH.id)) {
                 //console.log("Arquivo carregado não contido: ", filePATH.id);
-                refresh = true;
+                if(!foldersToRefresh.includes(path.dirname(filePATH.id))) foldersToRefresh.push(path.dirname(filePATH.id));
             }
         });
 
-        if(refresh) {
-            this.refreshDirectory(this.processCWD, this.fatherNode, this.selectionList);
+        // if(refresh) {
+        //     this.refreshDirectory(this.processCWD, this.fatherNode, this.selectionList);
+        // }
+        let filteredFoldersToRefresh = []
+        for(let i = 0; i < foldersToRefresh.length; i++) {
+            if(this.openFolders.includes(foldersToRefresh[i])) filteredFoldersToRefresh.push(foldersToRefresh[i]);
+        }
+        while(filteredFoldersToRefresh.length > 0) {
+            let folderID = filteredFoldersToRefresh.pop();
+            let folderNode = document.getElementById(folderID).parentElement;
+            this.refreshDirectory(folderID, folderNode, this.selectionList);
         }
     }
 
+    // Refresh the directory and the items in the sidebar
     refreshDirectory(directory, node, maintainSelections = []) {
         // Cleans the selection, because i tought it would be convenient
         while(this.selectionList.length > 0) {
@@ -512,19 +566,20 @@ class Sidebar extends SidebarCore {
         }
     }
 
+    // Create a name input field
     nameInputFunc(node, margin, writeFunction) {
         let nameInput = document.createElement('input');
         nameInput.setAttribute('type', 'text');
         node.appendChild(nameInput);
         nameInput.style.marginLeft = margin;
         nameInput.style.width = `calc(100% - ${margin})`;
-        let offsetTop = this.getElOffset(nameInput).top;
+        let offsetTop = this.getElementOffset(nameInput).top;
         nameInput.focus({
             preventScroll: true
         });
         this.sidebar.scrollTo(0, offsetTop);
         nameInput.addEventListener('focusout', () => {
-            try {nameInput.remove()} catch(err) {console.log(err)};
+            try {nameInput.remove()} catch(err) {};
         });
         nameInput.addEventListener('keydown', (event) => {
             if(event.key === 'Enter') {
@@ -535,12 +590,13 @@ class Sidebar extends SidebarCore {
                 writeFunction(nameInput);
             }
             else if(event.key === 'Escape') {
-                try {nameInput.remove()} catch(err) {console.log(err)};
+                try {nameInput.remove()} catch(err) {};
                 return;
             }
         })
     }
 
+    // Create a rename input field
     renameInputFunc(node, margin) {
         let renameInput = document.createElement('input');
         renameInput.setAttribute('type', 'text');
@@ -550,13 +606,13 @@ class Sidebar extends SidebarCore {
         node.style.display = 'none';
         renameInput.style.width = `calc(100% - ${margin})`;
         renameInput.style.marginLeft = margin;
-        let offsetTop = this.getElOffset(renameInput).top;
+        let offsetTop = this.getElementOffset(renameInput).top;
         renameInput.focus({
             preventScroll: true
         });
         this.sidebar.scrollTo(0, offsetTop);
         renameInput.addEventListener('focusout', () => {
-            try {renameInput.remove()} catch(err) {console.log(err)};
+            try {renameInput.remove()} catch(err) {};
             node.style.display = 'inline-block'
         });
         renameInput.addEventListener('keydown', (event) => {
@@ -568,10 +624,10 @@ class Sidebar extends SidebarCore {
                 let newName = path.join(path.resolve(node.id, ".."), renameInput.value);
                 fs.rename(node.id, newName, (err) => {
                     if(err) {
-                        try {renameInput.remove()} catch(err) {console.log(err)};
+                        try {renameInput.remove()} catch(err) {};
                     }
                     else {
-                        try {renameInput.remove()} catch(err) {console.log(err)};
+                        try {renameInput.remove()} catch(err) {};
                         this.selectionList[this.selectionList.length - 1] = newName;
                         node.setAttribute('id', newName);
                         this.refreshDirectory(this.processCWD, this.fatherNode);
@@ -579,13 +635,14 @@ class Sidebar extends SidebarCore {
                 });
             }
             else if(event.key === 'Escape') {
-                try {renameInput.remove()} catch(err) {console.log(err)};
+                try {renameInput.remove()} catch(err) {};
                 node.style.display = 'inline-block'
                 return;
             }
         })
     }
 
+    // Handle the new file button click
     newFileButtonClickCallback() {
         if(document.getElementsByClassName('selected')[0]  !== undefined) {
             let el = document.getElementById(this.selectionList[this.selectionList.length - 1]);
@@ -595,10 +652,10 @@ class Sidebar extends SidebarCore {
                     this.nameInputFunc(el.parentElement, `calc(${el.style.paddingLeft} + 0.5cm)`, (nameInput) => {
                         fs.writeFile(path.join(el.id, nameInput.value), "", (err) => {
                             if(err) {
-                                try {nameInput.remove()} catch(err) {console.log(err)};
+                                try {nameInput.remove()} catch(err) {};
                             }
                             else {
-                                try {nameInput.remove()} catch(err) {console.log(err)};
+                                try {nameInput.remove()} catch(err) {};
                                 this.refreshDirectory(el.id, el.parentElement);
                             }
                         });
@@ -617,10 +674,10 @@ class Sidebar extends SidebarCore {
                         fs.writeFile(path.join(path.dirname(el.id), nameInput.value), "", (err) => {
                             if(err) {
                                 alert(err);
-                                try {nameInput.remove()} catch(err) {console.log(err)};
+                                try {nameInput.remove()} catch(err) {};
                             }
                             else {
-                                try {nameInput.remove()} catch(err) {console.log(err)};
+                                try {nameInput.remove()} catch(err) {};
                                 this.refreshDirectory(path.dirname(el.id), anchorNode)
                             }
                         });
@@ -633,10 +690,10 @@ class Sidebar extends SidebarCore {
                 fs.writeFile(path.join(this.processCWD, nameInput.value), "", (err) => {
                     if(err) {
                         alert(err);
-                        try {nameInput.remove()} catch(err) {console.log(err)};
+                        try {nameInput.remove()} catch(err) {};
                     }
                     else {
-                        try {nameInput.remove()} catch(err) {console.log(err)};
+                        try {nameInput.remove()} catch(err) {};
                         this.refreshDirectory(this.processCWD, this.fatherNode);
                     }
                 })
@@ -647,6 +704,7 @@ class Sidebar extends SidebarCore {
         }
     }
 
+    // Handle the new folder button
     newFolderButtonClickCallback() {
         if(this.selectionList[0]  !== undefined) {
             let el = document.getElementById(this.selectionList[this.selectionList.length - 1]);
@@ -657,10 +715,10 @@ class Sidebar extends SidebarCore {
                         fs.mkdir(path.join(el.id, nameInput.value), (err) => {
                             if(err) {
                                 alert(err);
-                                try {nameInput.remove()} catch(err) {console.log(err)};
+                                try {nameInput.remove()} catch(err) {};
                             }
                             else {
-                                try {nameInput.remove()} catch(err) {console.log(err)};
+                                try {nameInput.remove()} catch(err) {};
                                 this.refreshDirectory(el.id, el.parentElement);
                             }
                         });
@@ -679,10 +737,10 @@ class Sidebar extends SidebarCore {
                         fs.mkdir(path.join(path.dirname(el.id), nameInput.value), (err) => {
                             if(err) {
                                 alert(err);
-                                try {nameInput.remove()} catch(err) {console.log(err)};
+                                try {nameInput.remove()} catch(err) {};
                             }
                             else {
-                                try {nameInput.remove()} catch(err) {console.log(err)};
+                                try {nameInput.remove()} catch(err) {};
                                 this.refreshDirectory(path.dirname(el.id), anchorNode);
                             }
                         });
@@ -695,10 +753,10 @@ class Sidebar extends SidebarCore {
                 fs.mkdir(path.join(this.processCWD, nameInput.value), (err) => {
                     if (err) {
                         alert(err);
-                        try {nameInput.remove()} catch(err) {console.log(err)};
+                        try {nameInput.remove()} catch(err) {};
                     }
                     else {
-                        try {nameInput.remove()} catch(err) {console.log(err)};
+                        try {nameInput.remove()} catch(err) {};
                         this.refreshDirectory(this.processCWD, this.fatherNode);
                     }
                 });
@@ -709,6 +767,7 @@ class Sidebar extends SidebarCore {
         }
     }
 
+    // Handle the delete action
     deleteCallback() {
         if(this.selectionList[0]  !== undefined) {
             while(this.selectionList.length > 0) {
@@ -718,12 +777,14 @@ class Sidebar extends SidebarCore {
         }
     }
 
+    // Handles the rename action
     renameCallback() {
         if(this.selectionList[0] === undefined) return;
         let el = document.getElementById(this.selectionList[this.selectionList.length - 1]);
         this.renameInputFunc(el, el.style.paddingLeft);
     }
 
+    // Handle the click in the collapse button
     collapseButtonClickCallback() {
         let activeSpans = document.getElementsByClassName('folder-down');
         while(activeSpans.length > 0) {
@@ -739,10 +800,12 @@ class Sidebar extends SidebarCore {
     }
 
     //TODO Mandar essa formula pro context bridge e adaptar isso no renderer tambem (formula do sliceMainFolderName)
+    // Calculates the sliceMainFolderName slice index
     sliceIndexFunc(px) {
         return Math.floor((px-40)/14)-3;
     }
 
+    // Slice the main folder name in the sidebarHeaderDiv
     sliceMainFolderName(sliceIndex, currentFolderName) {
         if(path.basename(this.processCWD).length <= 10 || path.basename(this.processCWD).length <= sliceIndex) {
             currentFolderName.innerText = path.basename(this.processCWD).toUpperCase();
