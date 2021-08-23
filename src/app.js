@@ -7,6 +7,7 @@ const {toolbarOptions, showColorPicker} = require('quill-increment');
 const ImageEdit  = require('quill-image-edit-module');
 const highlight = require('highlight.js');
 const Quill = require('quill');
+const { type } = require('os');
 var Delta = Quill.import('delta');
 
 Quill.register('modules/imageEdit', ImageEdit);
@@ -51,7 +52,13 @@ class App extends Sidebar {
 
         });
         window.addEventListener('fileClicked', (event) => {
-            this.editor.root.innerHTML = fs.readFileSync(event.detail.filePath);
+            //this.editor.root.innerHTML = fs.readFileSync(event.detail.filePath);
+            //FIXME ta lendo e travando ironicamente (Deveria ser assincrono, deve estar travando essa atribuição direta ao inner html)
+            fs.readFile(event.detail.filePath, (err, data) => {
+                if(err) throw err;
+                //Isso é um buffer, converter ele direito pra string e tudo mais
+                this.editor.insertText(0, String(data), 'api');
+            })
         });
     }
 
