@@ -271,13 +271,11 @@ class Sidebar extends SidebarCore {
             span.parentElement.querySelector(".nested").classList.toggle("active");
             span.classList.toggle("folder-down");
             if(span.classList.contains('folder-down')) {
-                console.log("added: ", span.id);
                 this.openFolders.push(span.id);
             }
             else {
                 let index = this.openFolders.indexOf(span.id);
                 if(index > -1) {
-                    console.log("removed: ", span.id);
                     this.openFolders.splice(index, 1);
                 }
             }
@@ -366,7 +364,6 @@ class Sidebar extends SidebarCore {
                         nestedUL.appendChild(folderLI);
                     }
                     else {
-                        console.log(folderPath === currentFolderPath)
                         if (folderPath === currentFolderPath) {
                             this.fatherNode.removeAttribute('id');
                             this.fatherNode.setAttribute('class', 'nested');
@@ -469,12 +466,10 @@ class Sidebar extends SidebarCore {
         if(directory === undefined) {
             directory = this.processCWD;
         }
-
         // Check for folders that don't exist anymore
         let filteredOpenFolders = [];
         for(let i = 0; i < this.openFolders; i++) {
             if(fs.existsSync(this.openFolders[i])) {
-                console.log(this.openFolders[i])
                 filteredOpenFolders.push(this.openFolders[i]);
             }
         }

@@ -53,11 +53,17 @@ class App extends Sidebar {
         });
         window.addEventListener('fileClicked', (event) => {
             //this.editor.root.innerHTML = fs.readFileSync(event.detail.filePath);
+            let fileExtension = this.getExtension(event.detail.filePath);
             //FIXME ta lendo e travando ironicamente (Deveria ser assincrono, deve estar travando essa atribuição direta ao inner html)
             fs.readFile(event.detail.filePath, (err, data) => {
                 if(err) throw err;
                 //Isso é um buffer, converter ele direito pra string e tudo mais
-                this.editor.insertText(0, String(data), 'api');
+                if(fileExtension !== 'html') {
+                    this.editor.innerHTML = String(data);
+                }
+                else {
+                    this.editor.insertText(0, String(data), 'api');
+                }
             })
         });
     }
